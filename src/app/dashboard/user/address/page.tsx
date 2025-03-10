@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Header from "@/components/common/Header";
 import Navbar from "@/components/common/Navbar";
@@ -76,23 +76,23 @@ const AddressPage = () => {
   };
   
 
-  const fetchUserAddresses = async () => {
+  const fetchUserAddresses = useCallback(async () => {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem("accessToken");
-
+  
     if (!userId || !token) {
       setError("You are not logged in");
       setLoading(false);
       return;
     }
-
+  
     try {
       const response = await axios.get(`${BACKEND_URL}/api/v1/addresses/users`, {
         params: { userId },
         headers: { Authorization: `Bearer ${token}` },
       });
-    
+  
       if (response.data.success && response.data.data) {
         setAddresses(
           response.data.data.sort((a: Address, b: Address) => Number(b.isMain) - Number(a.isMain))
@@ -106,7 +106,13 @@ const AddressPage = () => {
     } finally {
       setLoading(false);
     }
-  }
+  }, [userId]); // Pastikan `userId` masuk dalam dependency array.
+  
+  useEffect(() => {
+    if (userId) {
+      fetchUserAddresses();
+    }
+  }, [userId, fetchUserAddresses]);
 
   const addNewAddress = async () => {
     if (!newAddress.label || !newAddress.addressDetail || !userLocation || !newAddress.cityId) {

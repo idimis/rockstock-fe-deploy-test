@@ -1,81 +1,191 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
-import Image from "next/image";
+import OrderSummary from "@/components/checkout/OrderSummary";
+import DetailPayment from "@/components/checkout/DetailPayment";
+import AddressComponent from "@/components/checkout/AddressComponent";
+import SimpleNavbar from "@/components/common/SimpleNavbar";
+import { getAccessToken } from "@/lib/utils/auth";
+import DeliveryServiceComponent from "@/components/checkout/DeliveryServiceComponent";
+import { getCartData } from "@/lib/utils/cart";
+import { CartItem } from "@/types/cart";
+import { Warehouse } from "@/types/warehouse";
+import { placeOrder, updateOrderStatus } from "@/services/orderService";
+import { toast } from "react-toastify";
+import { MidtransPaymentResult, OrderResponse, PaymentMethod } from "@/types/payment";
+
+declare global {
+  interface Window {
+    snap: {
+      pay: (
+        token: string,
+        options: {
+          onSuccess?: (result: MidtransPaymentResult) => void;
+          onPending?: (result: MidtransPaymentResult) => void;
+          onError?: (result: MidtransPaymentResult) => void;
+          onClose?: () => void;
+        }
+      ) => void;
+    };
+  }
+}
 
 const CheckoutPage = () => {
   const router = useRouter();
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [selectedMethod, setSelectedMethod] = useState<number | null>(null);
+  const [addressId, setAddressId] = useState<number | null>(null);
+  const [addressPostalCode, setAddressPostalCode] = useState<string | null>(null);
+  const [nearestWarehouse, setNearestWarehouse] = useState<Warehouse | null>(null);
+  const [snapToken, setSnapToken] = useState<string | null>(null);
+  const [shippingFee, setShippingFee] = useState(0);
+  const accessToken = getAccessToken();
 
-  const handleProceedToPayment = () => {
-    router.push("/checkout/payment");
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://app.sandbox.midtrans.com/snap/snap.js";
+    script.setAttribute("data-client-key", process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!);
+    script.onload = () => console.log("Midtrans Snap script loaded.");
+    document.body.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    getCartData(setCartItems, setLoading, router);
+  }, [accessToken, router]);
+
+  useEffect(() => {
+    if (snapToken && window.snap) {
+      window.snap.pay(snapToken, {
+        onSuccess: async (result) => {
+          console.log("Payment success:", result);
+          try {
+            await updateOrderStatus("PROCESSING", {}, undefined, result.order_id);
+            toast.success("Payment successful! Redirecting...");
+            router.push("/checkout/success");
+          } catch (error) {
+            console.error("Error updating order status:", error);
+            toast.error("Payment successful, but failed to update order status.");
+          }
+        },
+        onPending: (result) => {
+          console.log("Waiting for payment:", result);
+          toast.info("Waiting for payment! You can check your order in the order list.");
+        },
+        onError: (result) => {
+          console.log("Payment failed:", result);
+          toast.error("Payment failed! Please try again.");
+        },
+        onClose: () => {
+          console.log("Payment popup closed.");
+          toast.warning("You closed the payment popup. If you have paid, please check your order status.");
+        },
+      });
+    }
+  }, [snapToken, router]);  
+
+  const subtotal = cartItems.reduce((total, item) => total + item.productPrice * item.quantity, 0);
+  const totalPrice = subtotal + shippingFee;
+  const totalWeight = cartItems.reduce((total, item) => total + item.productWeight, 0);
+
+  const handleConfirmPayment = async () => {
+    if (!addressId) {
+      toast.error("Please select an address before proceeding with payment.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const orderData: OrderResponse = await placeOrder(shippingFee, addressId, selectedMethod, accessToken);
+      const orderId = orderData.id;
+      const transactionToken = orderData.transactionToken;
+      const selectedPayment = paymentMethods.find((method) => method.id === selectedMethod);
+      if (!selectedPayment) return;
+
+      if (selectedPayment.name === "Manual Bank Transfer") {
+        router.push(`/checkout/payment/manual/${orderId}`);
+      } else {
+        setShowPopup(false);
+        setSnapToken(transactionToken);
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  // Dummy order details
-  const customerName = "Johnny Rotten";
-  const shippingAddress = "666 Underground Street, Dark Alley, NY 10101";
-  const cartItems = [
-    {
-      id: 1,
-      name: "Vintage Skull Lamp",
-      price: 49.99,
-      quantity: 1,
-      image: "/images/skull-lamp.jpg",
-    },
-    {
-      id: 2,
-      name: "Black Leather Armchair",
-      price: 299.99,
-      quantity: 1,
-      image: "/images/leather-armchair.jpg",
-    },
-  ];
-
-  const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      <Navbar />
+      <SimpleNavbar />
       <main className="flex-1 container mx-auto p-6 mt-8 mb-8">
         <h1 className="text-3xl font-bold mb-4 text-black">Checkout</h1>
-        <p className="text-black mb-6">Hey, <span className="font-semibold">{customerName}</span>! Review your order before proceeding to payment.</p>
-
-        {/* Order Summary */}
-        <div className="p-6 rounded-lg shadow-lg bg-gray-100">
-          <h2 className="text-xl font-semibold mb-4 text-black">Order Summary</h2>
-          
-          {cartItems.map((item) => (
-            <div key={item.id} className="flex items-center border-b border-gray-300 pb-4 mb-4">
-              <Image src={item.image} alt={item.name} width={80} height={80} className="rounded-lg" />
-              <div className="ml-4 flex-1">
-                <h3 className="text-lg font-semibold text-black">{item.name}</h3>
-                <p className="text-gray-700">${item.price.toFixed(2)} x {item.quantity}</p>
-              </div>
+        {loading && <p>Loading cart items...</p>}
+        {!loading && cartItems.length === 0 && <p>Your cart is empty.</p>}
+        {!loading && cartItems.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex flex-col md:col-span-2">
+              <AddressComponent 
+                addressId={addressId} setAddressId={setAddressId} 
+                addressPostalCode={addressPostalCode} setAddressPostalCode={setAddressPostalCode}
+                nearestWarehouse={nearestWarehouse} setNearestWarehouse={setNearestWarehouse} 
+              />
+              <DeliveryServiceComponent
+                origin={nearestWarehouse?.subDistrictPostalCode ?? null}
+                destination={addressPostalCode ?? null}
+                weight={totalWeight || 0}
+                setShippingFee={setShippingFee}
+              />
+              <OrderSummary cartItems={cartItems} />
             </div>
-          ))}
-
-          <div className="mt-4 text-black">
-            <p><span className="font-semibold">Shipping Address:</span> {shippingAddress}</p>
+            <DetailPayment
+              subtotal={subtotal}
+              shippingFee={shippingFee}
+              totalPrice={totalPrice}
+              onShowPopup={() => setShowPopup(true)}
+              paymentMethods={paymentMethods}
+              setPaymentMethods={setPaymentMethods}
+              selectedMethod={selectedMethod}
+              setSelectedMethod={setSelectedMethod}
+            />
           </div>
-
-          <div className="mt-4 text-xl font-semibold text-black">
-            Total: ${totalPrice.toFixed(2)}
-          </div>
-        </div>
-
-        {/* Proceed to Payment Button */}
-        <button
-          className="mt-6 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 w-full md:w-auto"
-          onClick={handleProceedToPayment}
-        >
-          Proceed to Payment
-        </button>
+        )}
       </main>
       <Footer />
+
+      {showPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-semibold text-black mb-4">Confirm Payment</h2>
+            <p className="text-gray-700 mb-4">
+              Once you proceed, you <b>cannot change</b>, add, or remove items, and you also
+              <b> cannot change the address</b> or payment method. Are you sure you want to continue?
+            </p>
+            <div className="flex justify-end gap-4">
+              <button
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-400"
+                onClick={() => setShowPopup(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`px-4 py-2 text-white font-bold rounded-lg w-full transition ${
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-500"
+                }`}
+                onClick={handleConfirmPayment}
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Confirm & Pay"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

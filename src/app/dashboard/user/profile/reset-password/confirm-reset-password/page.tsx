@@ -1,15 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const ConfirmResetPasswordPage = () => {
+const ResetPasswordContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -120,7 +120,7 @@ const ConfirmResetPasswordPage = () => {
                 className="absolute right-3 top-3 text-gray-500"
                 onClick={() => setShowOldPassword(!showOldPassword)}
               >
-                {showOldPassword ?"🙈" : "👁️"} 
+                {showOldPassword ? "🙈" : "👁️"} 
               </button>
             </div>
           </div>
@@ -181,6 +181,14 @@ const ConfirmResetPasswordPage = () => {
         </motion.form>
       )}
     </motion.div>
+  );
+};
+
+const ConfirmResetPasswordPage = () => {
+  return (
+    <Suspense fallback={<p className="text-center text-gray-500">Loading...</p>}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 };
 

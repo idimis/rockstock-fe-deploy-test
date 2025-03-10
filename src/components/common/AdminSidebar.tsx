@@ -13,13 +13,7 @@ const AdminSidebar = () => {
         <SidebarSection 
           title="📦 Order Management" 
           links={[
-            { name: "All Orders", path: "/dashboard/admin/orders" },
-            { name: "Pending Payments", path: "/dashboard/admin/orders/pending-payment" },
-            { name: "Awaiting Payment Confirmation", path: "/dashboard/admin/orders/awaiting-confirmation" },
-            { name: "Processing Orders", path: "/dashboard/admin/orders/processing" },
-            { name: "Shipped Orders", path: "/dashboard/admin/orders/shipped" },
-            { name: "Confirmed Orders", path: "/dashboard/admin/orders/confirmed" },
-            { name: "Cancelled Orders", path: "/dashboard/admin/orders/cancelled" }
+            { name: "View Orders", path: "/dashboard/admin/orders" },
           ]}
         />
         <SidebarSection 

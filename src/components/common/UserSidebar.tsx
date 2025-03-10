@@ -7,11 +7,10 @@ const UserSidebar = () => {
     <aside className="bg-white shadow-md w-64 p-4 hidden lg:block">
       <h2 className="text-lg font-semibold mb-4">User Dashboard</h2>
       <ul className="space-y-2">
-        <SidebarMenu 
+      <SidebarMenu 
           title="📦 My Orders" 
           links={[
-            { name: "View Orders", path: "/dashboard/user/my-orders" },
-            { name: "Track Order", path: "/dashboard/user/orders/track" }
+            { name: "View Orders", path: "/dashboard/user/orders" }
           ]}
         />
         <SidebarMenu 

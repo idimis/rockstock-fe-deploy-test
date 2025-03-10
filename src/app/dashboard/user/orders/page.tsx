@@ -12,10 +12,10 @@ import { Warehouse } from "@/types/warehouse";
 import { decodeToken } from "@/lib/utils/decodeToken";
 import { fetchOrderItems, updateOrderStatus } from "@/services/orderService";
 import OrderDetailPopup from "@/components/orders/OrderDetailPopup";
-import { fetchWarehouses, fetchWHAdminWarehouses } from "@/services/warehouseService";
+import { fetchWarehouses } from "@/services/warehouseService";
 import OrderFilter from "@/components/orders/OrderFilter";
-import AdminOrderCard from "@/components/orders/AdminOrderCard";
-import { fetchAndSetOrders, handleApprovePaymentProof, handleCancelOrder, handleDeliverOrder, handleOpenPaymentProof, handleRejectPaymentProof } from "@/lib/utils/order";
+import CustomerOrderCard from "@/components/orders/CustomerOrderCard";
+import { fetchAndSetOrders } from "@/lib/utils/order";
 
 const OrdersPage = () => {
   const router = useRouter();
@@ -25,6 +25,8 @@ const OrdersPage = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [isLoadingOrderItems, setIsLoadingOrderItems] = useState(false);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+
+  // Filters, Pagination & Sorting
   const [filters, setFilters] = useState<OrderFilterProps["filters"]>({ 
     status: null, 
     startDate: null, 
@@ -34,37 +36,36 @@ const OrdersPage = () => {
     sortOrder: "desc"
   });
   const [page, setPage] = useState(1);
-  const [size] = useState(10);
+  const [size] = useState(10); // Default page size
   const [totalPages, setTotalPages] = useState(1);
+
   const accessToken = getAccessToken();
   const decoded = accessToken ? decodeToken(accessToken) : null;
 
+  // Authorization
   useEffect(() => {
     if (!accessToken) {
       router.replace("/login");
       return;
     }
-    if (!decoded || decoded?.roles === "Customer") {
+    
+    if (!decoded || decoded?.roles !== "Customer") {
       router.replace(decoded ? "/unauthorized" : "/login");
     }
   }, [router, accessToken, decoded]);
 
+  // Fetch Orders
   useEffect(() => {
     fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
   }, [filters, page, size]);
   
   useEffect(() => {
-    if (decoded?.roles === "Super Admin") {
-      fetchWarehouses()
+    fetchWarehouses()
       .then(({ warehouses }) => setWarehouses(warehouses))
       .catch(() => console.error("Failed to fetch warehouses"));
-    }
-    if (decoded?.roles === "Warehouse Admin") {
-      fetchWHAdminWarehouses()
-      .then(({ warehouses }) => setWarehouses(warehouses))
-      .catch(() => console.error("Failed to fetch warehouses"));
-    }
-  }, []);
+    console.log("WH Lists: ", warehouses);
+    
+  }, [warehouses]);
 
   const handleOpenOrderDetail = async (order: Order) => {
     setSelectedOrder(order);
@@ -86,6 +87,31 @@ const OrdersPage = () => {
     setShowPopup(false);
   }
 
+  const handleUploadPaymentProof = (order: Order) => {
+    setSelectedOrder(order);
+    router.push(`/payments/manual/${order.orderId}`);
+  }
+
+  const handleCompleteOrder = async (order: Order) => {
+    try {
+      await updateOrderStatus("COMPLETE", {}, order.orderId);
+      console.log("Order completed successfully");
+      fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
+    } catch {
+      console.error("Failed to complete the order");
+    }
+  }
+
+  const handleCancelOrder = async (order: Order) => {
+    try {
+      await updateOrderStatus("CANCELED", {}, order.orderId);
+      console.log("Order canceled successfully");
+      fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
+    } catch {
+      console.error("Failed to cancel the order");
+    }
+  }
+
   return (
     <div>
       <Header />
@@ -97,19 +123,19 @@ const OrdersPage = () => {
             <h1 className="text-2xl font-semibold">My Orders</h1>
             <p>View and manage your past orders here.</p>
           </div>
+
           <OrderFilter filters={filters} setFilters={setFilters} setPage={setPage} warehouses={warehouses} />
+
+          {/* Order List */}
           <div>
             {orders.length > 0 ? (
               orders.map((order) => (
-                <AdminOrderCard key={order.orderId} 
-                  decoded={decoded}
+                <CustomerOrderCard key={order.orderId} 
                   order={order} 
                   onOpenDetail={handleOpenOrderDetail} 
-                  onOpenPaymentProof={handleOpenPaymentProof}
-                  onRejectPaymentProof={() => handleRejectPaymentProof(order, filters, page, size, setOrders, setTotalPages)}
-                  onApprovePaymentProof={() => handleApprovePaymentProof(order, filters, page, size, setOrders, setTotalPages)}
-                  onDeliverOrder={() => handleDeliverOrder(order, filters, page, size, setOrders, setTotalPages)}
-                  onCancel={() => handleCancelOrder(order, filters, page, size, setOrders, setTotalPages)}
+                  onUploadPaymentProof={handleUploadPaymentProof}
+                  onComplete={handleCompleteOrder}
+                  onCancel={handleCancelOrder} 
                 />
               ))
             ) : (
@@ -118,6 +144,8 @@ const OrdersPage = () => {
               </div>
             )}
           </div>
+          
+          {/* Pagination */}
           <div className="flex justify-center mt-4">
             <button 
               disabled={page === 1} 
@@ -126,7 +154,9 @@ const OrdersPage = () => {
             >
               Previous
             </button>
+
             <span className="text-lg font-semibold px-4">{page} / {totalPages}</span>
+
             <button 
               disabled={page === totalPages} 
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
@@ -138,6 +168,7 @@ const OrdersPage = () => {
         </main>
       </div>
       <Footer />
+
       {showPopup && selectedOrder && (
         <OrderDetailPopup
           order={selectedOrder}

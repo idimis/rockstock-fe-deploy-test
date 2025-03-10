@@ -1,17 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Gunakan useState untuk menyimpan token agar tidak error saat pre-rendering
   const [token, setToken] = useState<string | null>(null);
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     const tokenFromParams = searchParams.get("token");
 
     if (!tokenFromParams) {
@@ -19,32 +20,19 @@ const VerifyEmail = () => {
       return;
     }
 
-    setToken(tokenFromParams); // Simpan token di state
+    setToken(tokenFromParams);
 
     const verifyEmail = async () => {
-      console.log("Verifying token:", tokenFromParams);
-
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/verify-email?token=${tokenFromParams}`,
-          {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-          }
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/verify-email?token=${tokenFromParams}`
         );
 
-        if (!response.ok) {
-          console.error("Response not OK:", response);
-          throw new Error("Invalid or expired token");
-        }
-
-        const data = await response.json();
-        console.log("Server response:", data);
+        if (!response.ok) throw new Error("Invalid or expired token");
 
         setStatus("success");
         setTimeout(() => router.push(`/auth/setup-password?token=${tokenFromParams}`), 2000);
-      } catch (error) {
-        console.error("Error during verification:", error);
+      } catch {
         setStatus("error");
       }
     };
@@ -57,7 +45,7 @@ const VerifyEmail = () => {
       {status === "loading" && <p className="text-gray-600">Verifying your email...</p>}
       {status === "success" && (
         <div>
-          <p className="text-green-600 font-semibold">Email verified! Redirecting to password setup...</p>
+          <p className="text-green-600 font-semibold">Email verified! Redirecting...</p>
           {token && (
             <button
               onClick={() => router.push(`/auth/setup-password?token=${token}`)}
@@ -68,11 +56,17 @@ const VerifyEmail = () => {
           )}
         </div>
       )}
-      {status === "error" && (
-        <p className="text-red-500 font-semibold">Verification failed. The link may be expired or invalid.</p>
-      )}
+      {status === "error" && <p className="text-red-500 font-semibold">Verification failed.</p>}
     </div>
   );
 };
 
-export default VerifyEmail;
+const VerifyEmailPage = () => {
+  return (
+    <Suspense fallback={<p className="text-gray-600">Loading...</p>}>
+      <VerifyEmail />
+    </Suspense>
+  );
+};
+
+export default VerifyEmailPage;
