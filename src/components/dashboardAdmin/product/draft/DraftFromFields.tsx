@@ -15,15 +15,17 @@ const DraftFormFields: FC<DraftFieldsProps> = ({
   setSubmitting,
 }) => {
   useEffect(() => {
-    formik.setTouched({
-      productName: true,
-      detail: true,
-      price: true,
-      weight: true,
-      productCategory: true,
-      productPictures: true,
-    });
-  }, []);
+    if (formik.dirty && !formik.touched.productName) {
+      formik.setTouched({
+        productName: true,
+        detail: true,
+        price: true,
+        weight: true,
+        productCategory: true,
+        productPictures: true,
+      });
+    }
+  }, [formik, formik.dirty]);
 
   return (
     <div className="space-y-4">

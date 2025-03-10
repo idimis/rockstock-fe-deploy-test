@@ -12,12 +12,11 @@ export const ButtonDraft: React.FC<ButtonProps> = ({ formik, productId, isSubmit
 
   const handleSaveDraft = async () => {
     try {
-      const draftValues = { ...formik.values, categoryId: formik.values.productCategory };
-      const { productCategory, ...finalValues } = draftValues;
+      const finalValues = { ...formik.values, categoryId: formik.values.productCategory };
       await axiosInstance.patch(`/products/${productId}/draft`, finalValues);
         router.push("/dashboard/admin/products");
       localStorage.setItem('toastMessage', 'Draft saved successfully!');
-    } catch (error) {
+    } catch {
       localStorage.setItem('toastMessage', 'Failed to save draft');
     }
   };
@@ -27,7 +26,7 @@ export const ButtonDraft: React.FC<ButtonProps> = ({ formik, productId, isSubmit
       await axiosInstance.delete(`/products/${productId}/delete`);
       router.push("/dashboard/admin/products");
       localStorage.setItem('toastMessage', 'Draft deleted successfully!');
-    } catch (error) {
+    } catch {
       localStorage.setItem('toastMessage', 'Failed to delete the draft');
     }
   };

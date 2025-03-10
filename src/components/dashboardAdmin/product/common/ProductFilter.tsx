@@ -30,10 +30,6 @@ const ProductFilter = ({
     };
     fetchCategories();
   }, []);
-
-  const clearCategory = () => {
-    handleFilterChange({ category: null });
-  };
   
   const categoryOptions = [
     { value: null, label: "All Categories" },

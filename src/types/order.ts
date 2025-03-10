@@ -1,7 +1,7 @@
 import { statusColors } from "@/constants/statusColors";
 import { Warehouse } from "@/types/warehouse";
-import { CartItem } from "@/types/cart";
-import { DecodedToken } from "@/types/token";
+import { CartItem } from "./cart";
+import { DecodedToken } from "./token";
 
 export interface OrderItem {
   id: number;

@@ -2,7 +2,7 @@ import { ButtonProps } from "@/types/draft";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-export const EditButton: React.FC<ButtonProps> = ({ formik, productId, isSubmitting }) => {
+export const EditButton: React.FC<ButtonProps> = ({ isSubmitting }) => {
   const router = useRouter();
   const backToProduct = () => {
     router.push("/dashboard/admin/products");

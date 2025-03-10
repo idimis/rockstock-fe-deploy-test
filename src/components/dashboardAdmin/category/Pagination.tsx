@@ -7,7 +7,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePath, onPageChange }) => {
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePath }) => {
   const router = useRouter();
 
   const handlePageChange = (page: number) => {

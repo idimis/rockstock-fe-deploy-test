@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AddToCartButton from "../buttons/AddToCartButton";
+import AddToCartButton from "@/components/buttons/AddToCartButton";
 import { QuantitySelectorProps } from "@/types/product";
 
 const QuantitySelector: React.FC<QuantitySelectorProps> = ({ productId, totalStock, price }) => {

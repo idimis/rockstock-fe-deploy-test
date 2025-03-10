@@ -3,6 +3,7 @@ import { FiTrash, FiUploadCloud } from "react-icons/fi";
 import axiosInstance from "@/utils/axiosInstance";
 import { toast } from "react-toastify";
 import { ProductPicturesProps } from "@/types/draft"
+import Image from "next/image";
 
 const ProductPicturesForm: FC<ProductPicturesProps> = ({
   productId,
@@ -51,7 +52,7 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
         updateFormik(newPictures);
 
         toast.success("Picture uploaded successfully!");
-      } catch (error) {
+      } catch {
         toast.error("Failed to upload picture");
       } finally {
         setSubmitting(false);
@@ -70,7 +71,7 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
       updateFormik(newPictures);
 
       toast.success("Picture deleted successfully!");
-    } catch (error) {
+    } catch {
       toast.error("Error deleting picture");
     } finally {
       setSubmitting(false);
@@ -85,7 +86,7 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
           <div key={position} className="relative w-56 h-40 border rounded flex items-center justify-center bg-gray-100">
             {pic ? (
               <>
-                <img
+                <Image
                   src={pic}
                   alt={`Product ${position + 1}`}
                   className="w-full h-full object-cover rounded"

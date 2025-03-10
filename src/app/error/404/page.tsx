@@ -22,7 +22,7 @@ const NotFound = () => {
           Page Not Found
         </h1>
         <p className="text-lg sm:text-xl text-gray-600 mt-2">
-          The page you're looking for doesn't exist or may have been moved.
+          The page you are looking for does not exist or may have been moved.
         </p>
         <p className="text-gray-500 mt-1">Redirecting to homepage...</p>
         <button

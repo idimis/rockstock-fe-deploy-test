@@ -1,6 +1,6 @@
 "use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCategories } from "@/hooks/useCategories";
 import SkeletonRow from "@/components/dashboardAdmin/category/SkeletonRow";
 import Pagination from "@/components/dashboardAdmin/category/Pagination";

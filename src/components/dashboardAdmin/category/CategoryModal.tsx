@@ -7,6 +7,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosError, AxiosResponse } from "axios";
 import { Category, ApiErrorResponse, CategoryFormData } from "@/types/product";
+import Image from "next/image";
+
 
 const CategoryModal: React.FC<{ 
   isOpen: boolean; 
@@ -123,7 +125,7 @@ const CategoryModal: React.FC<{
                     className="border p-2 w-full"
                   />
                   <ErrorMessage name="file" component="div" className="text-red-500 text-sm" />
-                  {imagePreview && <img src={imagePreview} alt="Preview" className="mt-2 w-full h-32 object-cover" />}
+                  {imagePreview && <Image src={imagePreview} alt="Preview" className="mt-2 w-full h-32 object-cover" />}
                 </div>
 
                 {serverError && <div className="text-red-500 text-sm mt-2">{serverError}</div>}

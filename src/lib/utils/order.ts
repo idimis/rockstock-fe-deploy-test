@@ -1,12 +1,15 @@
 import { fetchOrders, updateOrderStatus } from "@/services/orderService";
 import { Order, OrderFilterProps } from "@/types/order";
 
+type SetOrdersFunction = (orders: Order[]) => void;
+type SetTotalPagesFunction = (totalPages: number) => void;
+
 export const fetchAndSetOrders = async (
   filters: OrderFilterProps["filters"],
   page: number,
   size: number,
-  setOrders: (orders: Order[]) => void,
-  setTotalPages: (totalPages: number) => void
+  setOrders: SetOrdersFunction,
+  setTotalPages: SetTotalPagesFunction
 ) => {
   try {
     const { orders, totalPages } = await fetchOrders(
@@ -34,7 +37,12 @@ export const handleOpenPaymentProof = (order: Order) => {
 };
 
 export const handleRejectPaymentProof = async (
-  order: Order, filters: OrderFilterProps["filters"], page: number, size: number, setOrders: any, setTotalPages: any
+  order: Order,
+  filters: OrderFilterProps["filters"],
+  page: number,
+  size: number,
+  setOrders: SetOrdersFunction,
+  setTotalPages: SetTotalPagesFunction
 ) => {
   try {
     await updateOrderStatus("WAITING_FOR_PAYMENT", {}, order.orderId);
@@ -46,37 +54,52 @@ export const handleRejectPaymentProof = async (
 };
 
 export const handleApprovePaymentProof = async (
-  order: Order, filters: OrderFilterProps["filters"], page: number, size: number, setOrders: any, setTotalPages: any
+  order: Order,
+  filters: OrderFilterProps["filters"],
+  page: number,
+  size: number,
+  setOrders: SetOrdersFunction,
+  setTotalPages: SetTotalPagesFunction
 ) => {
   try {
     await updateOrderStatus("PROCESSING", {}, order.orderId);
     console.log("Payment proof approved");
     fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
-  } catch {
-    console.error("Failed to approve payment proof");
+  } catch (error) {
+    console.error("Failed to approve payment proof", error);
   }
 };
 
 export const handleDeliverOrder = async (
-  order: Order, filters: OrderFilterProps["filters"], page: number, size: number, setOrders: any, setTotalPages: any
+  order: Order,
+  filters: OrderFilterProps["filters"],
+  page: number,
+  size: number,
+  setOrders: SetOrdersFunction,
+  setTotalPages: SetTotalPagesFunction
 ) => {
   try {
     await updateOrderStatus("ON_DELIVERY", {}, order.orderId);
     console.log("Order on delivery");
     fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
-  } catch {
-    console.error("Failed to deliver order");
+  } catch (error) {
+    console.error("Failed to deliver order", error);
   }
 };
 
 export const handleCancelOrder = async (
-  order: Order, filters: OrderFilterProps["filters"], page: number, size: number, setOrders: any, setTotalPages: any
+  order: Order,
+  filters: OrderFilterProps["filters"],
+  page: number,
+  size: number,
+  setOrders: SetOrdersFunction,
+  setTotalPages: SetTotalPagesFunction
 ) => {
   try {
     await updateOrderStatus("CANCELED", {}, order.orderId);
     console.log("Order canceled successfully");
     fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
-  } catch {
-    console.error("Failed to cancel the order");
+  } catch (error) {
+    console.error("Failed to cancel the order", error);
   }
 };
