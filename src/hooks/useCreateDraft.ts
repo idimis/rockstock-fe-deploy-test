@@ -16,7 +16,7 @@ export const useCreateDraft = () => {
       queryClient.invalidateQueries({ queryKey: ["products"] }); 
       router.push(`/dashboard/admin/products/draft/${data.productId}`);
     },
-    onError: (error) => {
+    onError: () => {
     },
   });
 };

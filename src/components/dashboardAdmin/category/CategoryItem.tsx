@@ -4,8 +4,15 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import axiosInstance from "@/utils/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { Category } from "@/types/product";
+import { AxiosError } from "axios";
 
-const CategoryItem = ({ category, onEdit }) => {
+interface CategoryItemProps {
+  category: Category;
+  onEdit: (category: Category) => void;
+}
+
+const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const deleteMutation = useMutation({
@@ -20,8 +27,9 @@ const CategoryItem = ({ category, onEdit }) => {
         window.location.reload();
       }, 500);
     },
-    onError: (error) => {
-      const errorMessage = error.response?.data?.message || "Failed to delete category";
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      const errorMessage = axiosError.response?.data?.message || "Failed to delete category";
       toast.error(errorMessage);
     },
   });

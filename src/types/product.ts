@@ -5,7 +5,7 @@ export interface QuantitySelectorProps {
   }
 
   export interface Product {
-    pictures(pictures: any): unknown;
+    pictures(pictures: ProductPicture[]): unknown;
     categoryId: number;
     productId: number;
     productName: string;
@@ -14,7 +14,7 @@ export interface QuantitySelectorProps {
     weight: number;
     totalStock: number;
     categoryName: string;
-    productPictures?: ProductPicture[];
+    productPictures: ProductPicture[];
     status: ProductStatus;
   }
   
@@ -34,6 +34,11 @@ export interface QuantitySelectorProps {
     categoryPicture: string;
   }
   
+  export interface CategoriesResponse {
+    content: Category[];
+    totalPages: number;
+  }
+  
   export interface ProductFormValues {
     productName: string;
     detail: string;
@@ -51,3 +56,10 @@ export interface QuantitySelectorProps {
   export interface ApiErrorResponse {
     message?: string;
   }
+
+export interface ApiResponse {
+    content: Product[];
+    totalPages: number;
+    number: number;
+  }
+

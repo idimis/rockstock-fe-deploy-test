@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useFormik } from "formik";
 import axiosInstance from "@/utils/axiosInstance";
@@ -9,10 +9,11 @@ import { Product, ProductStatus, ProductFormValues } from "@/types/product";
 import { ToastContainer } from "react-toastify";
 import ProductFormSkeleton from "@/components/dashboardAdmin/product/draft/DraftFromSkeleton";
 import { validationSchema } from "@/components/dashboardAdmin/product/draft/validationSchemas"
-import { ButtonDraft } from "@/components/dashboardAdmin/product/draft/ButtonDraft"
 import DraftFormFields from "@/components/dashboardAdmin/product/draft/DraftFromFields";
+import { EditButton } from "@/components/dashboardAdmin/product/draft/EditButton";
+import axios from "axios";
 
-const ProductDraftForm = () => {
+const ProductEditForm = () => {
   const params = useParams();
   const productId = params?.productId as string;
   const router = useRouter();
@@ -22,50 +23,33 @@ const ProductDraftForm = () => {
   const [isSubmitting, setSubmitting] = useState(false);
   const [localProductPictures, setLocalProductPictures] = useState<(string | null)[]>([null, null, null]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
       const response = await axiosInstance.get<Product>(`/products/${productId}`);
       const product = response.data;
-
+  
       if (!product || Object.values(product).every((value) => value === null)) {
         router.push("/error/404");
         return;
       }
-
+  
       setProductData(product);
-
-      if (product.status !== ProductStatus.DRAFT) {
+  
+      if (product.status !== ProductStatus.ACTIVE) {
         router.push("/error/403");
         return;
       }
-
-    } catch (error) {
+  
+    } catch {
       router.push("/error/404");
     }
-  };
-
-  useEffect(() => {
-    if (productData) {
-      const initialPictures: (string | null)[] = [null, null, null];
-
-      if (productData.productPictures && Array.isArray(productData.productPictures)) {
-        productData.productPictures.forEach((pic) => {
-          if (pic.position >= 1 && pic.position <= 3) {
-            initialPictures[pic.position - 1] = pic.productPictureUrl;
-          }
-        });
-      }
-
-      setLocalProductPictures(initialPictures);
-      formik.setFieldValue("productPictures", initialPictures);
-    }
-  }, [productData]);
+  }, [productId, router]);
 
   useEffect(() => {
     if (productId && !productData) {
       fetchProducts();
     }
-  }, [productId]);
+  }, [productId, productData, fetchProducts]);
 
   const formik = useFormik<ProductFormValues>({
     initialValues: {
@@ -91,20 +75,40 @@ const ProductDraftForm = () => {
       }
     
       try {
-        await axiosInstance.patch(`/products/${productId}/create`, values);
+        await axiosInstance.patch(`/products/${productId}/edit`, values);
         router.push("/dashboard/admin/products");
-        localStorage.setItem("toastMessage", "Product created successfully!");
-      } catch (error: any) {
-        console.error("Product creation failed:", error.response?.data || error.message);
-    
-        if (error.response?.status === 409) {
-          formik.setFieldError("productName", "Product name already exists. Please choose a different name.");
+        localStorage.setItem("toastMessage", "Product edited successfully!");
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 409) {
+            formik.setFieldError("productName", "Product name already exists. Please choose a different name.");
+          }
+          console.error("Axios error:", error.response?.data || error.message);
+        }
+        if (!axios.isAxiosError(error)) {
+          console.error("Unexpected error:", error);
         }
       } finally {
         setSubmitting(false);
-      }
+      }      
     }
   });
+
+  useEffect(() => {
+    if (productData) {
+      const initialPictures: (string | null)[] = [null, null, null];
+  
+      if (productData.productPictures && Array.isArray(productData.productPictures)) {
+        productData.productPictures.forEach((pic) => {
+          if (pic.position >= 1 && pic.position <= 3) {
+            initialPictures[pic.position - 1] = pic.productPictureUrl;
+          }
+        });
+      }
+  
+      setLocalProductPictures(initialPictures);
+    }
+  }, [productData]);
 
   return (
     <div className="p-8 bg-white shadow-lg rounded-xl max-w-3xl mx-auto">
@@ -113,12 +117,12 @@ const ProductDraftForm = () => {
         <ProductFormSkeleton />
       ) : (
         <>
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">📝 Create Product Form</h2>
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">📝 Edit Product</h2>
 
       <form onSubmit={formik.handleSubmit} className="space-y-6">
       <DraftFormFields
         formik={formik}
-        categoryData={categoryData}
+        categoryData={categoryData ?? null}
         isLoading={isLoading}
         localProductPictures={localProductPictures}
         setLocalProductPictures={setLocalProductPictures}
@@ -126,7 +130,7 @@ const ProductDraftForm = () => {
         isSubmitting={isSubmitting}
         setSubmitting={setSubmitting}
       />
-      <ButtonDraft
+      <EditButton
         formik={formik}
         isSubmitting={isSubmitting}
         productId={productId}
@@ -138,4 +142,4 @@ const ProductDraftForm = () => {
   );
 };
 
-export default ProductDraftForm;
+export default ProductEditForm;

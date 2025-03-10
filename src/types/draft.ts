@@ -1,5 +1,5 @@
 import { FormikProps } from "formik";
-import { ProductFormValues, Category, Product, ProductPicture } from "@/types/product";
+import { ProductFormValues, Category } from "@/types/product";
 
 export interface DraftFieldsProps {
   formik: FormikProps<ProductFormValues>;
