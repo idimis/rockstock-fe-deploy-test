@@ -7,7 +7,7 @@ import Footer from "@/components/common/Footer";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ProductTable from "@/components/dashboardAdmin/product/ProductTable";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 const AdminCategory = () => {
@@ -37,7 +37,9 @@ const AdminCategory = () => {
         
         <main className="flex-grow p-6 shadow-md">       
           {/* CategoryTable */}
+          <Suspense fallback={<div>Loading Product Cust...</div>}>
           <ProductTable />
+          </Suspense>
         </main>
       </div>
       

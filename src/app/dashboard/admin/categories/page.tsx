@@ -6,6 +6,7 @@ import Header from "@/components/common/Header";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { ToastContainer } from "react-toastify"; 
+import { Suspense } from "react";
 
 const AdminCategory = () => {
   return (
@@ -24,10 +25,11 @@ const AdminCategory = () => {
         
         <main className="flex-grow p-6 shadow-md">       
           {/* CategoryTable */}
+          <Suspense fallback={<div>Loading Product Cust...</div>}>
           <CategoryTable />
+          </Suspense>
         </main>
-      </div>
-      
+      </div> 
       {/* Footer */}
       <Footer />
     </div>

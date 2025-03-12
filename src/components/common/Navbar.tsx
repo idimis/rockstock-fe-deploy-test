@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { BiSolidUser, BiSolidHeart } from 'react-icons/bi';
@@ -111,7 +111,9 @@ const Navbar: React.FC<NavbarProps> = () => {
 
           {/* Search Bar */}
           <div className="relative flex-1 max-w-lg ml-6">
+          <Suspense fallback={<div>Loading Product Cust...</div>}>
               <SearchBar basePath="/products" />
+              </Suspense>
             </div>
         </div>
       </div>

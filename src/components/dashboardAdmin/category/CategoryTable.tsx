@@ -5,7 +5,7 @@ import { useCategories } from "@/hooks/useCategories";
 import SkeletonRow from "@/components/dashboardAdmin/category/SkeletonRow";
 import Pagination from "@/components/dashboardAdmin/Pagination";
 import SearchBar from "@/components/dashboardAdmin/SearchBar";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import CategoryModal from "@/components/dashboardAdmin/category/CategoryModal";
 import CategoryItem from "@/components/dashboardAdmin/category/CategoryItem";
 import { Category } from "@/types/product";
@@ -59,7 +59,9 @@ const CategoryTable = () => {
       </div>
 
       <div className="w-full md:w-auto flex md:justify-end">
+      <Suspense fallback={<div>Loading Product Cust...</div>}>
         <SearchBar basePath="/dashboard/admin/categories"/>
+        </Suspense>
       </div>
 
       <div className="space-y-4 mt-6">

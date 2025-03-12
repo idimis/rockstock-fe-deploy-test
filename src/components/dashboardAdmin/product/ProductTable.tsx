@@ -9,6 +9,7 @@ import ProductFilter from "@/components/dashboardAdmin/product/common/ProductFil
 import ProductItem from "@/components/dashboardAdmin/product/ProductItem";
 import { Product } from "@/types/product";
 import { useCreateDraft } from "@/hooks/useCreateDraft";
+import { Suspense } from "react";
 
 const ProductTable = () => {
   const searchParams = useSearchParams();
@@ -88,7 +89,9 @@ const ProductTable = () => {
           />
         </div>
         <div className="w-full md:w-auto flex md:justify-end">
+        <Suspense fallback={<div>Loading Product Cust...</div>}>
           <SearchBar basePath="/dashboard/admin/products"/>
+        </Suspense>
         </div>
       </div>
 

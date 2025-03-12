@@ -18,27 +18,33 @@ const LoginContent: React.FC = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
   const { data: session, status } = useSession();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      const roles = session?.roles;
-      const accessToken = session?.accessToken;
-		const refreshToken = session?.refreshToken;
+    if (status !== "authenticated" || !session) return;
+  
+    const roles = session.roles;
+    const accessToken = session.accessToken;
+    const refreshToken = session.refreshToken;
+  
+    if (!accessToken) return;
+  
     const decodedToken = jwtDecode<CustomJwtPayload>(accessToken);
-
-		const fullname = decodedToken.fullname;
-		localStorage.setItem("accessToken", accessToken);
-		localStorage.setItem("refreshToken", refreshToken)
-    localStorage.setItem("fullname", fullname);
-    
-    if (roles === "Super Admin" || roles === "Warehouse Admin")
+  
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken || "");
+    localStorage.setItem("fullname", decodedToken.fullname);
+  
+    if (roles === "Super Admin" || roles === "Warehouse Admin") {
       router.push("/dashboard/admin");
-    else router.push("/dashboard/user");
+    } else {
+      router.push("/dashboard/user");
     }
-  }, [status, router, session]);
+  }, [status, session, router]);
+  
 
   interface CustomJwtPayload {
     userId: number;

@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import React, { Suspense } from 'react';
 import Footer from '@/components/common/Footer';
 import Navbar from '@/components/common/Navbar';
 import Header from '@/components/common/Header';
@@ -17,7 +17,9 @@ const Inspirations: React.FC = () => {
           Discover unique furniture ideas that reflect your dark and edgy style. Whether you prefer the allure of gothic aesthetics, 
           the scholarly vibe of dark academia, or a nostalgic emo touch, we have something special for you.
         </p>
+        <Suspense fallback={<div>Loading Product Cust...</div>}>
         <ProductCust />
+      </Suspense>
       </main>
       <Footer />
     </div>

@@ -9,7 +9,9 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 
 const UserDashboard = () => {
-  const { data: session, status } = useSession();
+  const sessionData = useSession();
+  const session = sessionData?.data;
+  const status = sessionData?.status;
   const router = useRouter();
 
   const [fullname, setFullname] = useState<string | null>(null);
@@ -20,9 +22,9 @@ const UserDashboard = () => {
   useEffect(() => {
     console.log("Session status:", status);
     console.log("Session data:", session);
-  
+
     if (status === "loading") return;
-  
+
     if (session?.user) {
       console.log("User logged in via social login:", session.user);
       sessionStorage.setItem("fullname", session.user.name ?? session.user.email ?? "User");
@@ -34,24 +36,24 @@ const UserDashboard = () => {
       const isNewSignup = localStorage.getItem("newSignup") === "true";
       const isActivated = localStorage.getItem("accountActivated") === "true";
       const isPasswordSet = localStorage.getItem("passwordSet") === "true";
-  
+
       console.log("Checking localStorage:", { storedFullname, verifiedStatus, isNewSignup, isActivated, isPasswordSet });
-  
+
       if (storedFullname) {
         setFullname(storedFullname);
-  
+
         if (isNewSignup) {
           setShowSignupNotif(true);
           localStorage.removeItem("newSignup");
           setTimeout(() => setShowSignupNotif(false), 5000);
         }
-  
+
         if (isActivated) {
           setShowActivationNotif(true);
           localStorage.removeItem("accountActivated");
           setTimeout(() => setShowActivationNotif(false), 5000);
         }
-  
+
         if (isPasswordSet) {
           setShowPasswordSetupNotif(true);
           localStorage.removeItem("passwordSet");
@@ -63,7 +65,6 @@ const UserDashboard = () => {
       }
     }
   }, [session, status, router]);
-  
 
   if (status === "loading") return <p>Loading...</p>;
 
