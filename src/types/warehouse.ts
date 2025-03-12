@@ -5,4 +5,4 @@ export interface Warehouse {
     latitude: string;
     longitude: string;
     subDistrictPostalCode: string;
-  } 
+  }
