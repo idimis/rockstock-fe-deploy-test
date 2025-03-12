@@ -3,6 +3,8 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState, Suspense } from "react";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const SetupPasswordContent = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -27,7 +29,7 @@ const SetupPasswordContent = () => {
     }
 
     try {
-      const url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/setup-password?token=${token}`;
+      const url = `${BACKEND_URL}/api/v1/auth/setup-password?token=${token}`;
 
       const response = await fetch(url, {
         method: "POST",

@@ -3,6 +3,9 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const VerifyEmail = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -25,7 +28,7 @@ const VerifyEmail = () => {
     const verifyEmail = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/verify-email?token=${tokenFromParams}`
+          `${BACKEND_URL}/api/v1/auth/verify-email?token=${tokenFromParams}`
         );
 
         if (!response.ok) throw new Error("Invalid or expired token");

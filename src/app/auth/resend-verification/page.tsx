@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import Footer from "@/components/common/Footer";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const ResendVerification: React.FC = () => {
   const [email, setEmail] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -16,7 +18,7 @@ const ResendVerification: React.FC = () => {
     setIsSuccess(false);
   
     try {
-      const response = await fetch("http://localhost:8080/api/v1/auth/resend-verification", {
+      const response = await fetch(`${BACKEND_URL}/api/v1/auth/resend-verification`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

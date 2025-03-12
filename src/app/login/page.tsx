@@ -12,6 +12,8 @@ import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { signIn, getSession, useSession } from "next-auth/react"; 
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const LoginContent: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,7 +62,7 @@ const LoginContent: React.FC = () => {
     setError(null);
   
     try {
-      const response = await axios.post("http://localhost:8080/api/v1/auth/login", {
+      const response = await axios.post(`${BACKEND_URL}/api/v1/auth/login`, {
         email,
         password,
       });

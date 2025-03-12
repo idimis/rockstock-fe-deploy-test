@@ -26,7 +26,13 @@ const SignupContent: React.FC = () => {
     try {
       const formattedBirthdate = new Date(birthdate).toISOString();
   
-      const response = await axios.post("http://localhost:8080/api/v1/auth/register", {
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+      
+      if (!BACKEND_URL) {
+        throw new Error("Backend URL is not set in environment variables.");
+      }
+
+      const response = await axios.post(`${BACKEND_URL}/api/v1/auth/register`, {
         fullname,
         email,
         gender,
