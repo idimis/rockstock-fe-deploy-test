@@ -5,16 +5,22 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { BiSolidUser, BiSolidHeart } from 'react-icons/bi';
 import { FaCartShopping } from 'react-icons/fa6';
-import { FiSearch } from 'react-icons/fi';
 import logoImage from "@/public/rockstock1.svg";
 import { fetchCartQuantity } from '@/services/cartService';
 import { decodeToken } from '@/lib/utils/decodeToken';
 import { getAccessToken } from '@/lib/utils/auth';
 import { signOut } from "next-auth/react";
+import SearchBar from '@/components/common/SearchBar';
+
 
 type UserRole = "Customer" | "Super Admin" | "Warehouse Admin";
 
-const Navbar = () => {
+interface NavbarProps {
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+}
+
+const Navbar: React.FC<NavbarProps> = () => {
   const [isActive, setIsActive] = useState<string>('');
   const [cartQuantity, setCartQuantity] = useState<number>(0);
   const [accessToken, setAccessToken] = useState<string | null>(null);
@@ -103,17 +109,12 @@ const Navbar = () => {
         {/* Search and account section */}
         <div className="flex items-center space-x-8">
 
-          {/* Search bar */}
+          {/* Search Bar */}
           <div className="relative flex-1 max-w-lg ml-6">
-            <input
-              type="text"
-              placeholder="Search furniture..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-600"
-            />
-            <button className="absolute top-1 right-0 p-2 bg-red-600 rounded-md text-white">
-              <FiSearch className="h-5 w-5" />
-            </button>
-          </div>
+              <SearchBar basePath="/products" />
+            </div>
+        </div>
+      </div>
           
           {/* Authentication Buttons */}
           {!accessToken ? (
@@ -170,8 +171,6 @@ const Navbar = () => {
               </div>
             </div>
           )}
-        </div>
-      </div>
     </header>
   );
 };

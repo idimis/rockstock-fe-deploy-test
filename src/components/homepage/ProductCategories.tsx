@@ -1,129 +1,112 @@
-import React from "react";
-import Link from "next/link";
+"use client";
+
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import { useCategories } from "@/hooks/useCategories";
+import { Category } from "@/types/product";
 
-// Dummy category data
-const categories = [
-  {
-    name: "Emo Vibes",
-    slug: "emo-vibes",
-    description:
-      "Furniture inspired by the raw emotional energy of emo aesthetics.",
-    icon: "/icons/emo-vibes.png",
-  },
-  {
-    name: "Dark Academia",
-    slug: "dark-academia",
-    description:
-      "Timeless, scholarly pieces with a dark, intellectual vibe.",
-    icon: "/icons/dark-academia.png",
-  },
-  
-  {
-    name: "Gothic Minimalism",
-    slug: "gothic-minimalism",
-    description: "Sleek, dark, and simple minimalistic designs.",
-    icon: "/icons/gothic-minimalism.png",
-  },
-  {
-    name: "Victorian Revival",
-    slug: "victorian-revival",
-    description: "Bring back the elegance and opulence of the Victorian era.",
-    icon: "/icons/victorian-revival.png",
-  },
-  {
-    name: "Metal Aesthetic",
-    slug: "metal-aesthetic",
-    description: "Furniture with an industrial, gritty edge.",
-    icon: "/icons/metal-aesthetic.png",
-  },
-  
+const ProductCategories = () => {
+  const router = useRouter();
+  const { data: categoryData } = useCategories(1, 20);
+  const categories: Category[] = useMemo(() => categoryData?.content ?? [], [categoryData]);
 
-  {
-    name: "Steampunk Charm",
-    slug: "steampunk-charm",
-    description: "A mix of Victorian and industrial steampunk style.",
-    icon: "/icons/steampunk-charm.png",
-  },
-];
+  const [itemsPerPage, setItemsPerPage] = useState(2);
+  const [index, setIndex] = useState<number>(0);
+  const [direction, setDirection] = useState<"left" | "right">("right");
 
-const CategorySection: React.FC = () => {
-  const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth >= 768) {
+        setItemsPerPage(4);
+      } else {
+        setItemsPerPage(2);
+      }
+    };
 
-  const scrollLeft = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: -300, behavior: "smooth" });
-    }
-  };
+    updateItemsPerPage();
+    window.addEventListener("resize", updateItemsPerPage);
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
 
-  const scrollRight = () => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollBy({ left: 300, behavior: "smooth" });
-    }
+  const scroll = useCallback(
+    (dir: "left" | "right") => {
+      if (categories.length <= itemsPerPage) return;
+      setDirection(dir);
+
+      setIndex((prevIndex) =>
+        dir === "right"
+          ? (prevIndex + itemsPerPage) % categories.length
+          : (prevIndex - itemsPerPage + categories.length) % categories.length
+      );
+    },
+    [categories, itemsPerPage]
+  );
+
+  const handleCategoryClick = (categoryId: number) => {
+    router.push(`/product?category=${categoryId}`);
   };
 
   return (
-    <section className="max-w-[1440px] mx-auto px-8 py-12 my-8">
-      <h2 className="text-3xl font-semibold text-center text-black mb-8">
+    <section className="max-w-[1080px] mx-auto py-8 mb-8">
+      <h2 className="text-2xl md:text-4xl text-gray-800 font-bold text-center mb-12">
         Featured Categories
       </h2>
 
-      <div className="relative">
-        <div className="flex items-center space-x-4 absolute inset-0 justify-between z-10">
-          <button
-            onClick={scrollLeft}
-            className="bg-black text-white p-4 rounded-full shadow-md hover:bg-gray-700 transition"
-          >
-            &lt;
-          </button>
-          <button
-            onClick={scrollRight}
-            className="bg-black text-white p-4 rounded-full shadow-md hover:bg-gray-700 transition"
-          >
-            &gt;
-          </button>
-        </div>
-
-        <div
-          ref={scrollContainerRef}
-          className="overflow-x-auto flex gap-6 p-6 scroll-smooth"
+      <div className="relative flex items-center justify-center">
+        <button
+          onClick={() => scroll("left")}
+          className="absolute left-2 md:left-0 bg-black text-white px-3 py-3 md:px-4 md:py-4 rounded-full shadow-md hover:bg-gray-700 z-10"
         >
-          {categories.map((category) => (
-            <div
-              key={category.slug}
-              className="relative border rounded-lg shadow-lg overflow-hidden group w-[300px] h-[400px] bg-white"
-            >
-              <div className="relative w-full h-[60%] bg-gray-100 flex items-center justify-center">
-                <Image
-                  src={category.icon}
-                  alt={category.name}
-                  width={200}
-                  height={200}
-                  className="object-contain"
-                />
-              </div>
+          &#8249;
+        </button>
 
-              <div className="p-4 bg-white flex flex-col justify-between h-[40%]">
-                <h3 className="text-lg font-semibold text-black">{category.name}</h3>
-                <p className="text-sm text-gray-600 mt-2">{category.description}</p>
-                <Link
-                  href={`/category/${category.slug}`}
-                  className="mt-4 inline-block px-6 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-black transition"
-                >
-                  Explore {category.name}
-                </Link>
-              </div>
-
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center text-white">
-                <span className="text-xl font-semibold">Click to Explore</span>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-hidden w-full max-w-6xl relative px-4 md:px-0">
+          <motion.div
+            key={index}
+            initial={{ x: direction === "right" ? "20%" : "-20%" }}
+            animate={{ x: "0%" }}
+            exit={{ x: direction === "right" ? "-20%" : "20%" }}
+            transition={{ type: "spring", stiffness: 100, damping: 15 }}
+            className="flex gap-4 md:gap-6 justify-center w-full"
+          >
+            {categories.length > 0 &&
+              [...categories, ...categories]
+                .slice(index, index + itemsPerPage)
+                .map((category, i) => (
+                  <div
+                    key={category.categoryId || i}
+                    className="relative w-[45%] md:w-[22%] h-48 md:h-72 rounded-lg overflow-hidden shadow-md flex-shrink-0"
+                  >
+                    <Image
+                      src={category.categoryPicture || "/placeholder.jpg"}
+                      alt={category.categoryName}
+                      layout="fill"
+                      className="object-cover"
+                    />
+                    <div className="absolute inset-0 flex pb-4 md:pb-6 items-end justify-center">
+                      <button
+                        onClick={() => handleCategoryClick(category.categoryId)}
+                        className="text-gray-900 text-xs md:text-lg font-semibold bg-white min-w-[100px] md:min-w-[150px] h-8 md:h-10 flex items-center justify-center px-3 md:px-4 py-1 md:py-2 rounded-full transition-all hover:bg-black hover:text-white"
+                      >
+                        {category.categoryName}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+          </motion.div>
         </div>
+
+        <button
+          onClick={() => scroll("right")}
+          className="absolute right-2 md:right-0 bg-black text-white px-3 py-3 md:px-4 md:py-4 rounded-full shadow-md hover:bg-gray-700 z-10"
+        >
+          &#8250;
+        </button>
       </div>
     </section>
   );
 };
 
-export default CategorySection;
+export default ProductCategories;

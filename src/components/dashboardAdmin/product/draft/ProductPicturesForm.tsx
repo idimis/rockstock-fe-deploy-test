@@ -33,7 +33,7 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
       }
   
       if (file.size > maxSize) {
-        toast.error("File size must not exceed 1MB.");
+        toast.error("File size must not exceed 1 MB.");
         return;
       }
 
@@ -89,7 +89,9 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
                 <Image
                   src={pic}
                   alt={`Product ${position + 1}`}
-                  className="w-full h-full object-cover rounded"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="rounded"
                 />
                 <button
                   type="button"

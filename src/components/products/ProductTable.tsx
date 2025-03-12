@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
 import FullSkeleton from "@/components/dashboardAdmin/product/common/FullSkeleton";
 import Pagination from "@/components/dashboardAdmin/Pagination";
-import SearchBar from "@/components/dashboardAdmin/SearchBar";
+import SearchBar from "@/components/common/SearchBar";
 import ProductFilter from "@/components/dashboardAdmin/product/common/ProductFilter";
 import ProductItem from "@/components/dashboardAdmin/product/ProductItem";
 import { Product } from "@/types/product";
@@ -25,28 +25,23 @@ const ProductTable = () => {
 
   const updateQueryParams = (params: Record<string, string | number | null | undefined>) => {
     const query = new URLSearchParams(searchParams.toString());
-  
+
     Object.entries(params).forEach(([key, value]) => {
-      if (key === "category" && value == null) {
-        query.delete("sortField");
-        query.delete("sort");
-      }
-  
       if (
         value === null || 
         value === "" ||
         (key === "page" && value === 1) ||
-        (key === "sortField" && value === "name") ||
-        (key === "sort" && value === "asc")
+        (key === "sortField" && value === "name" && query.get("sort") === "asc") ||
+        (key === "sort" && value === "asc" && query.get("sortField") === "name")
       ) {
         query.delete(key);
       } else {
         query.set(key, String(value));
       }
     });
-  
-    router.push(`/product?${query.toString()}`);
-  }; 
+
+    router.push(`/dashboard/admin/products?${query.toString()}`);
+  };
 
   const handlePageChange = (page: number) => {
     updateQueryParams({ page });
@@ -88,7 +83,7 @@ const ProductTable = () => {
           />
         </div>
         <div className="w-full md:w-auto flex md:justify-end">
-          <SearchBar basePath="/dashboard/admin/products"/>
+          <SearchBar basePath="/dashboard/admin/products" />
         </div>
       </div>
 

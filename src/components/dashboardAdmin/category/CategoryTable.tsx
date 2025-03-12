@@ -3,8 +3,8 @@
 import { useSearchParams } from "next/navigation";
 import { useCategories } from "@/hooks/useCategories";
 import SkeletonRow from "@/components/dashboardAdmin/category/SkeletonRow";
-import Pagination from "@/components/dashboardAdmin/category/Pagination";
-import SearchBar from "@/components/dashboardAdmin/category/SearchBar";
+import Pagination from "@/components/dashboardAdmin/Pagination";
+import SearchBar from "@/components/dashboardAdmin/SearchBar";
 import { useState, useEffect } from "react";
 import CategoryModal from "@/components/dashboardAdmin/category/CategoryModal";
 import CategoryItem from "@/components/dashboardAdmin/category/CategoryItem";
@@ -42,21 +42,23 @@ const CategoryTable = () => {
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h2 className="text-3xl md:text-4xl font-semibold text-gray-800 mb-6 md:mb-0">
+        <h2 className="text-xl md:text-4xl text-center font-semibold text-gray-800 mb-6 md:mb-0">
           📦 Category Management
         </h2>
+        <div className="flex justify-center md:justify-end w-full md:w-auto">
         <button 
-          className="bg-blue-500 text-white px-6 py-3 text-lg font-medium rounded-lg shadow-md hover:bg-blue-600 transition"
+          className="bg-blue-500 text-xl text-white px-2 py-2 rounded w-2/3 md:w-48"
           onClick={() => {
             setEditingCategory(null);
             setIsModalOpen(true);
           }}
         >
-          + Create Category
+          Create Category
         </button>
+        </div>
       </div>
 
-      <div className="flex justify-end mb-4">
+      <div className="w-full md:w-auto flex md:justify-end">
         <SearchBar basePath="/dashboard/admin/categories"/>
       </div>
 

@@ -1,40 +1,27 @@
 "use client";
 
-import useProducts from "@/hooks/useProductSample";
-import ProductCard from "@/components/products/ProductCard";
-import Pagination from "@/components/products/Pagination";
-import Navbar from "@/components/common/Navbar";
+import React from 'react';
+import Footer from '@/components/common/Footer';
+import Navbar from '@/components/common/Navbar';
+import Header from '@/components/common/Header';
+import ProductCust from '@/components/products/ProductsCust';
 
-const Products = () => {
-  const { products, currentPage, setCurrentPage, totalPages, loading } = useProducts();
-
+const Inspirations: React.FC = () => {
   return (
-    <><Navbar /><div className="max-w-4xl mx-auto p-4">
-      <h1 className="text-2xl text-gray-500 font-bold mb-4">Products</h1>
-
-      {loading ? (
-        <p className="text-center">Loading...</p>
-      ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {products.length > 0 ? (
-            products.map((product) => (
-              <ProductCard
-                key={product.productId}
-                productId={product.productId}
-                productName={product.productName}
-                price={product.price}
-                productPictures={product.productPictures} />
-            ))
-          ) : (
-            <p>No products available</p>
-          )}
-        </div>
-      )}
-
-      {/* Pagination */}
-      <Pagination currentPage={currentPage} totalPages={totalPages} setCurrentPage={setCurrentPage} />
-    </div></>
+    <div>
+      <Header />
+      <Navbar />
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl text-gray-700 font-bold mb-4">Inspirations</h1>
+        <p className="text-gray-700">
+          Discover unique furniture ideas that reflect your dark and edgy style. Whether you prefer the allure of gothic aesthetics, 
+          the scholarly vibe of dark academia, or a nostalgic emo touch, we have something special for you.
+        </p>
+        <ProductCust />
+      </main>
+      <Footer />
+    </div>
   );
 };
 
-export default Products;
+export default Inspirations;

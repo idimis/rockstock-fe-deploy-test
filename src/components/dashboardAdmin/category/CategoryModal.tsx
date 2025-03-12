@@ -7,8 +7,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AxiosError, AxiosResponse } from "axios";
 import { Category, ApiErrorResponse, CategoryFormData } from "@/types/product";
-import Image from "next/image";
-
+import Image from 'next/image';
 
 const CategoryModal: React.FC<{ 
   isOpen: boolean; 
@@ -115,7 +114,7 @@ const CategoryModal: React.FC<{
                   <label className="block mb-2">Upload Image</label>
                   <input
                     type="file"
-                    accept="image/jpeg, image/png, image/gif"
+                    accept="image/jpeg, image/jpg, image/png, image/gif"
                     onChange={(event) => {
                       const file = event.currentTarget.files?.[0] || null;
                       setFieldValue("file", file);
@@ -125,7 +124,18 @@ const CategoryModal: React.FC<{
                     className="border p-2 w-full"
                   />
                   <ErrorMessage name="file" component="div" className="text-red-500 text-sm" />
-                  {imagePreview && <Image src={imagePreview} alt="Preview" className="mt-2 w-full h-32 object-cover" />}
+                  {imagePreview && (
+                    <div className="mt-2 w-full h-32 overflow-hidden">
+                    <Image 
+                      src={imagePreview} 
+                      alt="Preview" 
+                      layout="cover" 
+                      width={100}
+                      height={100}
+                      objectFit="contain" 
+                    />
+                  </div>
+                )}
                 </div>
 
                 {serverError && <div className="text-red-500 text-sm mt-2">{serverError}</div>}
@@ -133,7 +143,7 @@ const CategoryModal: React.FC<{
                 <div className="mt-4 flex justify-between">
                   <button 
                     type="submit" 
-                    className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50" 
+                    className={`bg-blue-500 text-white px-4 py-2 rounded ${isSubmitting ? "cursor-not-allowed" : ""}`} 
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (category ? "Updating..." : "Creating...") : (category ? "Update" : "Create")}

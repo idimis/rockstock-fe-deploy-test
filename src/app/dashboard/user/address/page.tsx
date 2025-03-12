@@ -9,6 +9,9 @@ import UserSidebarPanel from "@/components/common/UserSidebar";
 import "leaflet/dist/leaflet.css"
 // import L from "leaflet";
 import axios from "axios";
+import { City, District, Province, SubDistrict } from "@/types/address";
+import { getCitiesByProvinceId, getDistrictByCityId, getProvinces, getSubDistrictByDistrictId } from "@/services/addressService";
+import Select from "react-select";
 // import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 interface Address {
@@ -19,7 +22,7 @@ interface Address {
   latitude: number;
   note: string;
   isMain: boolean;
-  cityId?: number
+  subDistrictId?: number
 }
 
 // const customMarkerIcon = new L.Icon({
@@ -41,6 +44,87 @@ const AddressPage = () => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [newAddress, setNewAddress] = useState<Partial<Address>>({});
+  const [provinces, setProvinces] = useState<Province[]>([]);
+  const [selectedProvince, setSelectedProvince] = useState<Province | null>(null);
+  const [cities, setCities] = useState<City[]>([]);
+  const [selectedCity, setSelectedCity] = useState<City | null>(null);
+  const [districts, setDistricts] = useState<District[]>([]);
+  const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
+  const [subDistricts, setSubDistricts] = useState<SubDistrict[]>([]);
+  const [selectedSubDistrict, setSelectedSubDistrict] = useState<SubDistrict | null>(null);
+
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      try {
+        const provinceData = await getProvinces();   
+        setProvinces(provinceData);
+      } catch (error) {
+        console.error("Error fetching provinces:", error);
+      }
+    };
+    fetchProvinces();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedProvince) return;
+    const fetchCities = async () => {
+      try {
+        const cityData = await getCitiesByProvinceId(selectedProvince.id);
+        setCities(cityData);
+      } catch (error) {
+        console.error("Error fetching cities:", error);
+      }
+    };
+    fetchCities();
+  }, [selectedProvince]);
+
+  useEffect(() => {
+    if (!selectedCity) return;
+    const fetchDistricts = async () => {
+      try {
+        const districtData = await getDistrictByCityId(selectedCity.id);
+        setDistricts(districtData);
+      } catch (error) {
+        console.error("Error fetching districts:", error);
+      }
+    };
+    fetchDistricts();
+  }, [selectedCity]);
+
+  useEffect(() => {
+    if (!selectedDistrict) return;
+
+    const fetchSubDistricts = async () => {
+      try {
+        const subDistrictData = await getSubDistrictByDistrictId(selectedDistrict.id);
+        setSubDistricts(subDistrictData);
+      } catch (error) {
+        console.error("Error fetching sub districts:", error);
+      }
+    };
+
+    fetchSubDistricts();
+  }, [selectedDistrict]);
+
+  const provinceOptions = provinces.map((province) => ({
+    value: province.id,
+    label: province.name,
+  }));
+  
+  const cityOptions = cities.map((city) => ({
+    value: city.id,
+    label: city.name,
+  }));
+  
+  const districtOptions = districts.map((district) => ({
+    value: district.id,
+    label: district.name,
+  }));
+  
+  const subDistrictOptions = subDistricts.map((subDistrict) => ({
+    value: subDistrict.id,
+    label: subDistrict.name,
+  }));
 
   useEffect(() => {
     const storedUserId = localStorage.getItem("userId");
@@ -108,7 +192,7 @@ const AddressPage = () => {
   }, [userId, fetchUserAddresses]);
 
   const addNewAddress = async () => {
-    if (!newAddress.label || !newAddress.addressDetail || !userLocation || !newAddress.cityId) {
+    if (!newAddress.label || !newAddress.addressDetail || !userLocation || !newAddress.subDistrictId) {
       setError("All fields are required");
       return;
     }
@@ -132,7 +216,6 @@ const AddressPage = () => {
       console.error("Failed to add new address", err);
     }
   };
-  
   
   const setMainAddress = async (addressId: number) => {
     const token = localStorage.getItem("accessToken");
@@ -209,12 +292,82 @@ const AddressPage = () => {
               placeholder="Address Detail"
               onChange={(e) => setNewAddress({ ...newAddress, addressDetail: e.target.value })}
             />
-            <input
-              type="text"
-              className="border p-2 w-full mb-2"
-              placeholder="City ID"
-              onChange={(e) => setNewAddress({ ...newAddress, cityId: parseInt(e.target.value) })}
-            />
+            <div>
+              {/* Province Select */}
+              <label className="block mb-2 text-sm font-medium text-gray-700">Select Province:</label>
+              <Select
+                options={provinceOptions}
+                value={selectedProvince ? { value: selectedProvince.id, label: selectedProvince.name } : null}
+                onChange={(selectedOption) => {
+                  if (selectedOption) {
+                    const province = provinces.find((p) => p.id === selectedOption.value) || null;
+                    setSelectedProvince(province);
+                    setSelectedCity(null);
+                    setCities([]);
+                  }
+                }}
+                placeholder="Search and select a province..."
+                isSearchable
+                className="mt-2"
+              />
+
+              {/* City Select */}
+              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select City:</label>
+              <Select
+                options={cityOptions}
+                value={selectedCity ? { value: selectedCity.id, label: selectedCity.name } : null}
+                onChange={(selectedOption) => {
+                  if (selectedOption) {
+                    const city = cities.find((c) => c.id === selectedOption.value) || null;
+                    setSelectedCity(city);
+                    setSelectedDistrict(null);
+                    setDistricts([]);
+                  }
+                }}
+                placeholder="Search and select a city..."
+                isSearchable
+                className="mt-2"
+                isDisabled={!selectedProvince}
+              />
+
+              {/* District Select */}
+              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select District:</label>
+              <Select
+                options={districtOptions}
+                value={selectedDistrict ? { value: selectedDistrict.id, label: selectedDistrict.name } : null}
+                onChange={(selectedOption) => {
+                  if (selectedOption) {
+                    const district = districts.find((d) => d.id === selectedOption.value) || null;
+                    setSelectedDistrict(district);
+                    setSelectedSubDistrict(null);
+                    setSubDistricts([]);
+                  }
+                }}
+                placeholder="Search and select a district..."
+                isSearchable
+                className="mt-2"
+                isDisabled={!selectedCity}
+              />
+
+              {/* Sub District Select */}
+              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select Sub District:</label>
+              <Select
+                options={subDistrictOptions}
+                value={selectedSubDistrict ? { value: selectedSubDistrict.id, label: selectedSubDistrict.name } : null}
+                onChange={(selectedOption) => {
+                  if (selectedOption) {
+                    const subDistrictId = selectedOption.value
+                    setNewAddress({ ...newAddress, subDistrictId})
+                    const subDistrict = subDistricts.find((s) => s.id === selectedOption.value) || null;
+                    setSelectedSubDistrict(subDistrict);
+                  }
+                }}
+                placeholder="Search and select a sub-district..."
+                isSearchable
+                className="mt-2"
+                isDisabled={!selectedDistrict}
+              />
+            </div>
             <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={addNewAddress}>
               Save
             </button>

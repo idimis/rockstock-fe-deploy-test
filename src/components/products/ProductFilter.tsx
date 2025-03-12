@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
 
-const ProductFilter = ({
+const ProductsFilter = ({
   currentSortField,
   currentSortDirection,
   currentCategory,
@@ -112,4 +112,4 @@ const ProductFilter = ({
   );
 };
 
-export default ProductFilter;
+export default ProductsFilter;

@@ -19,3 +19,24 @@ export interface AddressComponentProps {
     nearestWarehouse: Warehouse | null;
     setNearestWarehouse: (warehouse: Warehouse | null) => void;
 }
+
+export interface Province {
+    id: number;
+    name: string; 
+}
+
+export interface City {
+    id: number;
+    name: string; 
+}
+
+export interface District {
+    id: number;
+    name: string; 
+}
+
+export interface SubDistrict {
+    id: number;
+    name: string; 
+    postalCode: string;
+}

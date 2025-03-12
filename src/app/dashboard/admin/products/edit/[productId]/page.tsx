@@ -7,9 +7,9 @@ import axiosInstance from "@/utils/axiosInstance";
 import { useCategories } from "@/hooks/useCategories";
 import { Product, ProductStatus, ProductFormValues } from "@/types/product";
 import { ToastContainer } from "react-toastify";
-import ProductFormSkeleton from "@/components/dashboardAdmin/product/draft/DraftFromSkeleton";
+import ProductFormSkeleton from "@/components/dashboardAdmin/product/draft/DraftFormSkeleton";
 import { validationSchema } from "@/components/dashboardAdmin/product/draft/validationSchemas"
-import DraftFormFields from "@/components/dashboardAdmin/product/draft/DraftFromFields";
+import DraftFormFields from "@/components/dashboardAdmin/product/draft/DraftFormFields";
 import { EditButton } from "@/components/dashboardAdmin/product/draft/EditButton";
 import axios from "axios";
 

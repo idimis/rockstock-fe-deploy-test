@@ -7,7 +7,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePath }) => {
+const ProductsPage: React.FC<PaginationProps> = ({ currentPage, totalPages, basePath }) => {
   const router = useRouter();
 
   const handlePageChange = (page: number) => {
@@ -26,7 +26,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePa
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex justify-center mt-6">
+    <div className="flex justify-center mt-6 space-x-2">
       <button
         className={`px-4 py-2 mx-1 rounded-lg ${currentPage === 1 ? "bg-gray-300" : "bg-blue-500 text-white"}`}
         onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
@@ -58,4 +58,4 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, basePa
   );
 };
 
-export default Pagination;
+export default ProductsPage;

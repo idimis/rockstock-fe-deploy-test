@@ -7,10 +7,10 @@ import axiosInstance from "@/utils/axiosInstance";
 import { useCategories } from "@/hooks/useCategories";
 import { Product, ProductStatus, ProductFormValues } from "@/types/product";
 import { ToastContainer } from "react-toastify";
-import ProductFormSkeleton from "@/components/dashboardAdmin/product/draft/DraftFromSkeleton";
+import ProductFormSkeleton from "@/components/dashboardAdmin/product/draft/DraftFormSkeleton";
 import { validationSchema } from "@/components/dashboardAdmin/product/draft/validationSchemas"
 import { ButtonDraft } from "@/components/dashboardAdmin/product/draft/ButtonDraft"
-import DraftFormFields from "@/components/dashboardAdmin/product/draft/DraftFromFields";
+import DraftFormFields from "@/components/dashboardAdmin/product/draft/DraftFormFields";
 import axios from "axios";
 
 const ProductDraftForm = () => {

@@ -6,7 +6,7 @@ import { ApiResponse } from "@/types/product";
 
 export const useProducts = (
   page: number,
-  pageSize: number,
+  pageSize: number = 10,
   searchQuery: string,
   categoryId?: number | null,
   sortField: string = "name",
@@ -18,6 +18,7 @@ export const useProducts = (
       const response = await axiosInstance.get("/products/active", {
         params: {
           page: page - 1,
+          size: pageSize,
           name: searchQuery,
           categoryId: categoryId,
           sortField,

@@ -56,10 +56,9 @@ export interface QuantitySelectorProps {
   export interface ApiErrorResponse {
     message?: string;
   }
-
-export interface ApiResponse {
+  
+  export interface ApiResponse {
     content: Product[];
     totalPages: number;
-    number: number;
-  }
-
+    number: number;
+    }
