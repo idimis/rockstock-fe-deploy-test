@@ -10,6 +10,7 @@ import logoImage from "@/public/rockstock1.svg";
 import { fetchCartQuantity } from '@/services/cartService';
 import { decodeToken } from '@/lib/utils/decodeToken';
 import { getAccessToken } from '@/lib/utils/auth';
+import { signOut } from "next-auth/react";
 
 type UserRole = "Customer" | "Super Admin" | "Warehouse Admin";
 
@@ -57,9 +58,14 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("fullname");
+    localStorage.removeItem("userId");
     setAccessToken(null);
     setDecoded(null);
     setMenuOpen(false);
+    signOut({ callbackUrl: "/" });
   };
 
   const handleLinkClick = (link: string) => {
@@ -113,7 +119,7 @@ const Navbar = () => {
           {!accessToken ? (
             <div className="flex items-center space-x-2">
               <Link href="/login" className="px-4 py-1 border text-white bg-red-600 font-bold rounded-lg hover:bg-red-700">Login</Link>
-              <Link href="/register" className="px-4 py-1 border border-red-600 text-red-600 font-bold rounded-lg hover:bg-gray-200">Register</Link>
+              <Link href="/signup" className="px-4 py-1 border border-red-600 text-red-600 font-bold rounded-lg hover:bg-gray-200">Register</Link>
             </div>
           ) : (
             <div className='flex items-center space-x-6'>

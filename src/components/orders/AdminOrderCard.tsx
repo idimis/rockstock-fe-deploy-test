@@ -1,11 +1,29 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { AdminOrderCardProps } from "@/types/order";
 import { formatCurrency, formatStatus } from "@/lib/utils/format";
 import { statusColors } from "@/constants/statusColors";
 
-const AdminOrderCard: React.FC<AdminOrderCardProps> = ({ decoded, order, onOpenDetail, onOpenPaymentProof, onRejectPaymentProof, onApprovePaymentProof, onDeliverOrder, onCancel }) => {
+const AdminOrderCard: React.FC<AdminOrderCardProps> = ({ 
+  decoded, order, 
+  onOpenDetail, onOpenPaymentProof, 
+  onRejectPaymentProof, onApprovePaymentProof, 
+  onDeliverOrder, onCancel 
+}) => {
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleConfirm = async () => {
+    if (confirmAction) {
+      setLoading(true);
+      await confirmAction();
+      setLoading(false);
+      setConfirmAction(null);
+    }
+  };
+
   return (
     <div key={order.orderId} className="border p-4 my-2 w-full bg-white rounded-lg shadow mx-auto">
       <div>
@@ -73,13 +91,13 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({ decoded, order, onOpenD
             </button>
             <button
               className="px-4 py-1 bg-red-600 text-sm font-semibold text-white rounded-lg hover:bg-red-500"
-              onClick={() => onRejectPaymentProof(order)}
+              onClick={() => setConfirmAction(() => () => onRejectPaymentProof(order))}
             >
               Reject Payment Proof
             </button>
             <button
               className="px-4 py-1 bg-green-600 text-sm font-semibold text-white rounded-lg hover:bg-green-500"
-              onClick={() => onApprovePaymentProof(order)}
+              onClick={() => setConfirmAction(() => () => onApprovePaymentProof(order))}
             >
               Approve Payment Proof
             </button>
@@ -89,19 +107,44 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({ decoded, order, onOpenD
           <div className="flex gap-2 items-center">
             <button
               className="px-4 py-1 bg-red-600 text-sm font-semibold text-white rounded-lg hover:bg-red-500"
-              onClick={() => onCancel(order)}
+              onClick={() => setConfirmAction(() => () => onCancel(order))}
             >
               Cancel Order
             </button>
             <button
               className="px-4 py-1 bg-green-600 text-sm font-semibold text-white rounded-lg hover:bg-green-500"
-              onClick={() => onDeliverOrder(order)}
+              onClick={() => setConfirmAction(() => () => onDeliverOrder(order))}
             >
               Deliver Order
             </button>
           </div>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      {confirmAction && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-30 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <p className="text-lg font-semibold mb-4">Are you sure you want to proceed?</p>
+            <div className="flex justify-between gap-2">
+              <button 
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-gray-500"
+                onClick={() => setConfirmAction(null)}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button 
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500"
+                onClick={handleConfirm}
+                disabled={loading}
+              >
+                {loading ? "Processing..." : "Confirm"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

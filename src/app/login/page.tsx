@@ -12,7 +12,6 @@ import { useRouter } from "next/navigation";
 import { jwtDecode } from "jwt-decode";
 import { signIn, getSession, useSession } from "next-auth/react"; 
 
-
 const LoginContent: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +24,7 @@ const LoginContent: React.FC = () => {
 
   useEffect(() => {
     if (status === "authenticated") {
-      const scope = session?.scope;
+      const roles = session?.roles;
       const accessToken = session?.accessToken;
 		const refreshToken = session?.refreshToken;
     const decodedToken = jwtDecode<CustomJwtPayload>(accessToken);
@@ -34,11 +33,10 @@ const LoginContent: React.FC = () => {
 		localStorage.setItem("accessToken", accessToken);
 		localStorage.setItem("refreshToken", refreshToken)
     localStorage.setItem("fullname", fullname);
-
-
-      if (scope === "Super_Admin" || scope === "Warehouse_Admin")
-        router.push("/dashboard/admin");
-      else router.push("/dashboard/user");
+    
+    if (roles === "Super Admin" || roles === "Warehouse Admin")
+      router.push("/dashboard/admin");
+    else router.push("/dashboard/user");
     }
   }, [status, router, session]);
 
@@ -46,7 +44,7 @@ const LoginContent: React.FC = () => {
     userId: number;
     exp: number;
     iat: number;
-    scope: string;
+    roles: string;
     fullname: string;
   }
 
@@ -70,15 +68,12 @@ const LoginContent: React.FC = () => {
         localStorage.setItem("refreshToken", refreshToken);
         localStorage.setItem("fullname", fullname);
   
-        
         const decodedToken = jwtDecode<CustomJwtPayload>(accessToken);
         console.log("Decoded token:", decodedToken);
   
-        
         localStorage.setItem("userId", decodedToken.userId.toString());
   
-        
-        if (decodedToken.scope === "Customer") {
+        if (decodedToken.roles === "Customer") {
           router.push("/dashboard/user");
         } else {
           router.push("/dashboard/admin");
@@ -133,9 +128,6 @@ const LoginContent: React.FC = () => {
     setLoading(false);
   };
   
-  
-  
-
   return (
     <>
       <div className="flex flex-col lg:flex-row min-h-screen bg-light-gray">

@@ -11,6 +11,8 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const accessToken = getAccessToken();
+  console.log("Button Product Id: ", productId);
+  
   
   const handleAddToCart = async () => {
     if (!accessToken) {
@@ -24,15 +26,15 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }
 
     try {
       const response = await addToCart({
-          productId, quantity,
-          cartItemId: 0,
-          totalAmount: 0,
-          cartId: 0,
-          productName: "",
-          productImage: "",
-          productPrice: 0,
-          productWeight: 0,
-          productPictures: null
+          productId, quantity
+          // cartItemId: 0,
+          // totalAmount: 0,
+          // cartId: 0,
+          // productName: "",
+          // productImage: "",
+          // productPrice: 0,
+          // productWeight: 0,
+          // productPictures: null
       });
       if (response.status === 200) {
         setSuccess(true);

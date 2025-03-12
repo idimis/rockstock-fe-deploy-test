@@ -4,6 +4,8 @@ import { getAccessToken } from "@/lib/utils/auth";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const accessToken = getAccessToken();
+console.log("Order Service Token: ", accessToken);
+
 
 export const fetchOrders = async (
   status: string | null, 

@@ -12,7 +12,6 @@ import { Warehouse } from "@/types/warehouse";
 import { decodeToken } from "@/lib/utils/decodeToken";
 import { fetchOrderItems, updateOrderStatus } from "@/services/orderService";
 import OrderDetailPopup from "@/components/orders/OrderDetailPopup";
-import { fetchWarehouses } from "@/services/warehouseService";
 import OrderFilter from "@/components/orders/OrderFilter";
 import CustomerOrderCard from "@/components/orders/CustomerOrderCard";
 import { fetchAndSetOrders } from "@/lib/utils/order";
@@ -41,7 +40,7 @@ const OrdersPage = () => {
 
   const accessToken = getAccessToken();
   const decoded = accessToken ? decodeToken(accessToken) : null;
-
+  
   // Authorization
   useEffect(() => {
     if (!accessToken) {
@@ -57,15 +56,8 @@ const OrdersPage = () => {
   // Fetch Orders
   useEffect(() => {
     fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
+    setWarehouses([]);
   }, [filters, page, size]);
-  
-  useEffect(() => {
-    fetchWarehouses()
-      .then(({ warehouses }) => setWarehouses(warehouses))
-      .catch(() => console.error("Failed to fetch warehouses"));
-    console.log("WH Lists: ", warehouses);
-    
-  }, [warehouses]);
 
   const handleOpenOrderDetail = async (order: Order) => {
     setSelectedOrder(order);
@@ -89,7 +81,7 @@ const OrdersPage = () => {
 
   const handleUploadPaymentProof = (order: Order) => {
     setSelectedOrder(order);
-    router.push(`/payments/manual/${order.orderId}`);
+    router.push(`/checkout/payment/manual/${order.orderId}`);
   }
 
   const handleCompleteOrder = async (order: Order) => {
@@ -146,11 +138,11 @@ const OrdersPage = () => {
           </div>
           
           {/* Pagination */}
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center items-center mt-4">
             <button 
               disabled={page === 1} 
               onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              className={`px-4 py-2 mx-2 ${page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+              className={`px-4 py-2 mx-2 rounded-lg ${page === 1 ? "bg-gray-300 cursor-not-allowed" : "bg-red-600 text-white"}`}
             >
               Previous
             </button>
@@ -160,7 +152,7 @@ const OrdersPage = () => {
             <button 
               disabled={page === totalPages} 
               onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              className={`px-4 py-2 mx-2 ${page === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-blue-500 text-white"}`}
+              className={`px-4 py-2 mx-2 rounded-lg ${page === totalPages ? "bg-gray-300 cursor-not-allowed" : "bg-red-600 text-white"}`}
             >
               Next
             </button>

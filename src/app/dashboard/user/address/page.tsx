@@ -50,12 +50,6 @@ const AddressPage = () => {
   }, []);
 
   useEffect(() => {
-    if (userId) {
-      fetchUserAddresses();
-    }
-  }, [userId]);
-
-  useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -75,7 +69,6 @@ const AddressPage = () => {
     setNewAddress((prev) => ({ ...prev, latitude: lat, longitude: lng }));
   };
   
-
   const fetchUserAddresses = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -202,44 +195,42 @@ const AddressPage = () => {
         <main className="flex-grow p-6 bg-white shadow-md">
           <h1 className="text-2xl font-bold mb-4">📍 My Addresses</h1>
           <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
-      {error && <p className="text-red-500">{error}</p>}
-      <input
-        type="text"
-        className="border p-2 w-full mb-2"
-        placeholder="Label"
-        onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })}
-      />
-      <input
-        type="text"
-        className="border p-2 w-full mb-2"
-        placeholder="Address Detail"
-        onChange={(e) => setNewAddress({ ...newAddress, addressDetail: e.target.value })}
-      />
-      <input
-        type="text"
-        className="border p-2 w-full mb-2"
-        placeholder="City ID"
-        onChange={(e) => setNewAddress({ ...newAddress, cityId: parseInt(e.target.value) })}
-      />
-      <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={addNewAddress}>
-        Save
-      </button>
-    </div>
-          
-  
-          {error && <div className="text-red-500 mb-4">{error}</div>}
-  
+            <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
+            {error && <p className="text-red-500">{error}</p>}
+            <input
+              type="text"
+              className="border p-2 w-full mb-2"
+              placeholder="Label"
+              onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })}
+            />
+            <input
+              type="text"
+              className="border p-2 w-full mb-2"
+              placeholder="Address Detail"
+              onChange={(e) => setNewAddress({ ...newAddress, addressDetail: e.target.value })}
+            />
+            <input
+              type="text"
+              className="border p-2 w-full mb-2"
+              placeholder="City ID"
+              onChange={(e) => setNewAddress({ ...newAddress, cityId: parseInt(e.target.value) })}
+            />
+            <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={addNewAddress}>
+              Save
+            </button>
+          </div>
+        {error && <div className="text-red-500 mb-4">{error}</div>}
+
           <div className="p-4 bg-gray-50 shadow-md rounded-xl border border-gray-200">
             {loading ? (
               <p>Loading...</p>
             ) : (
               <ul>
                 <Map 
-  latitude={userLocation?.lat || 0} 
-  longitude={userLocation?.lng || 0} 
-  setCoordinates={handleMapClick} 
-/>
+                  latitude={userLocation?.lat || 0} 
+                  longitude={userLocation?.lng || 0} 
+                  setCoordinates={handleMapClick} 
+                />
 
                 {addresses.length > 0 ? (
                   addresses.map((address) => (
@@ -290,8 +281,8 @@ const AddressPage = () => {
             )}
           </div>
         </main>
-      </div>
-      <Footer />
+    </div>
+    <Footer />
   
       {editModalOpen && selectedAddress && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

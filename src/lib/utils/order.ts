@@ -1,15 +1,12 @@
 import { fetchOrders, updateOrderStatus } from "@/services/orderService";
 import { Order, OrderFilterProps } from "@/types/order";
 
-type SetOrdersFunction = (orders: Order[]) => void;
-type SetTotalPagesFunction = (totalPages: number) => void;
-
 export const fetchAndSetOrders = async (
   filters: OrderFilterProps["filters"],
   page: number,
   size: number,
-  setOrders: SetOrdersFunction,
-  setTotalPages: SetTotalPagesFunction
+  setOrders: (orders: Order[]) => void,
+  setTotalPages: (totalPages: number) => void
 ) => {
   try {
     const { orders, totalPages } = await fetchOrders(
@@ -37,12 +34,12 @@ export const handleOpenPaymentProof = (order: Order) => {
 };
 
 export const handleRejectPaymentProof = async (
-  order: Order,
-  filters: OrderFilterProps["filters"],
-  page: number,
-  size: number,
-  setOrders: SetOrdersFunction,
-  setTotalPages: SetTotalPagesFunction
+  order: Order, 
+  filters: OrderFilterProps["filters"], 
+  page: number, 
+  size: number, 
+  setOrders: (orders: Order[]) => void, 
+  setTotalPages: (totalPages: number) => void,
 ) => {
   try {
     await updateOrderStatus("WAITING_FOR_PAYMENT", {}, order.orderId);
@@ -54,12 +51,12 @@ export const handleRejectPaymentProof = async (
 };
 
 export const handleApprovePaymentProof = async (
-  order: Order,
-  filters: OrderFilterProps["filters"],
-  page: number,
-  size: number,
-  setOrders: SetOrdersFunction,
-  setTotalPages: SetTotalPagesFunction
+  order: Order, 
+  filters: OrderFilterProps["filters"], 
+  page: number, 
+  size: number, 
+  setOrders: (orders: Order[]) => void, 
+  setTotalPages: (totalPages: number) => void
 ) => {
   try {
     await updateOrderStatus("PROCESSING", {}, order.orderId);
@@ -71,12 +68,12 @@ export const handleApprovePaymentProof = async (
 };
 
 export const handleDeliverOrder = async (
-  order: Order,
-  filters: OrderFilterProps["filters"],
-  page: number,
-  size: number,
-  setOrders: SetOrdersFunction,
-  setTotalPages: SetTotalPagesFunction
+  order: Order, 
+  filters: OrderFilterProps["filters"], 
+  page: number, 
+  size: number, 
+  setOrders: (orders: Order[]) => void, 
+  setTotalPages: (totalPages: number) => void
 ) => {
   try {
     await updateOrderStatus("ON_DELIVERY", {}, order.orderId);
@@ -88,12 +85,12 @@ export const handleDeliverOrder = async (
 };
 
 export const handleCancelOrder = async (
-  order: Order,
-  filters: OrderFilterProps["filters"],
-  page: number,
-  size: number,
-  setOrders: SetOrdersFunction,
-  setTotalPages: SetTotalPagesFunction
+  order: Order, 
+  filters: OrderFilterProps["filters"], 
+  page: number, 
+  size: number, 
+  setOrders: (orders: Order[]) => void, 
+  setTotalPages: (totalPages: number) => void
 ) => {
   try {
     await updateOrderStatus("CANCELED", {}, order.orderId);

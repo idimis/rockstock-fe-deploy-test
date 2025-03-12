@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { getAccessToken } from "@/lib/utils/auth";
-import { CartItem } from "@/types/cart";
+import { AddToCartButtonProps, CartItem } from "@/types/cart";
 
 interface AxiosErrorResponse {
   response?: {
@@ -13,7 +13,7 @@ interface AxiosErrorResponse {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const addToCart = async (payload: CartItem, attempt = 1): Promise<AxiosResponse> => {
+export const addToCart = async (payload: AddToCartButtonProps, attempt = 1): Promise<AxiosResponse> => {
   try {
     const accessToken = getAccessToken();
     if (!accessToken) throw new Error("Unauthorized: No token provided");
@@ -39,7 +39,7 @@ export const addToCart = async (payload: CartItem, attempt = 1): Promise<AxiosRe
       await new Promise((resolve) => setTimeout(resolve, retryDelay));
       return addToCart(payload, attempt + 1); // Ensure all parameters are passed
     } else {
-      throw new Error(errorMessage || "Failed to fetch orders");
+      throw new Error(errorMessage || "Failed to add to cart");
     }
   }
 }

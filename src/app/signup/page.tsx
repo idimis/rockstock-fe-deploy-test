@@ -26,7 +26,7 @@ const SignupContent: React.FC = () => {
     try {
       const formattedBirthdate = new Date(birthdate).toISOString();
   
-      const response = await axios.post("https://localhost:8080/api/v1/auth/register", {
+      const response = await axios.post("http://localhost:8080/api/v1/auth/register", {
         fullname,
         email,
         gender,
