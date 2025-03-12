@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { formatStatus } from "@/lib/utils/format";
 import { statusColors } from "@/constants/statusColors";
 import { OrderFilterProps } from "@/types/order";
@@ -10,11 +10,10 @@ import { decodeToken } from "@/lib/utils/decodeToken";
 import { FaSortAmountDown, FaSortAmountUp } from "react-icons/fa";
 
 const OrderFilter: React.FC<OrderFilterProps> = ({ filters, setFilters, setPage, warehouses }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const router = useRouter();  
   const accessToken = getAccessToken();
   const decode = accessToken ? decodeToken(accessToken) : null;
-  
+  const [searchParams, setSearchParams] = useState<URLSearchParams | null>(null);
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [tempStartDate, setTempStartDate] = useState(filters.startDate || "");
   const [tempEndDate, setTempEndDate] = useState(filters.endDate || "");
@@ -32,8 +31,16 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ filters, setFilters, setPage,
     router.push(`?${queryParams.toString()}`, { scroll: false });
   };
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSearchParams(new URLSearchParams(window.location.search));
+    }
+  }, []);
+
   // Initialize filters from URL parameters when the component mounts
   useEffect(() => {
+    if (!searchParams) return; // Prevent running before state is set
+  
     const sortOrderValue = searchParams.get("sortOrder");
     const validatedSortOrder: "asc" | "desc" | null =
       sortOrderValue === "asc" || sortOrderValue === "desc" ? sortOrderValue : "desc";
@@ -52,7 +59,6 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ filters, setFilters, setPage,
     setTempEndDate(initialFilters.endDate || "");
   }, [searchParams, setFilters]);
   
-
   // Handle filter change
   const handleFilterChange = (key: keyof typeof filters, value: string | null) => {
     const updatedFilters = { ...filters, [key]: value };

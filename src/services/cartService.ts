@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { getAccessToken } from "@/lib/utils/auth";
-import { AddToCartButtonProps, CartItem } from "@/types/cart";
+import { AddToCartButtonProps } from "@/types/cart";
 
 interface AxiosErrorResponse {
   response?: {

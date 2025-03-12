@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { Order, OrderFilterProps, OrderItem } from "@/types/order";
 import { Warehouse } from "@/types/warehouse";
 import { decodeToken } from "@/lib/utils/decodeToken";
-import { fetchOrderItems, updateOrderStatus } from "@/services/orderService";
+import { fetchOrderItems } from "@/services/orderService";
 import OrderDetailPopup from "@/components/orders/OrderDetailPopup";
 import { fetchWarehouses, fetchWHAdminWarehouses } from "@/services/warehouseService";
 import OrderFilter from "@/components/orders/OrderFilter";
@@ -64,7 +64,7 @@ const OrdersPage = () => {
       .then(({ warehouses }) => setWarehouses(warehouses))
       .catch(() => console.error("Failed to fetch warehouses"));
     }
-  }, []);
+  }, [decoded?.roles]);
 
   const handleOpenOrderDetail = async (order: Order) => {
     setSelectedOrder(order);
