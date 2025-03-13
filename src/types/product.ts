@@ -5,6 +5,7 @@ export interface QuantitySelectorProps {
   }
 
   export interface Product {
+    productCategory: string;
     pictures(pictures: ProductPicture[]): unknown;
     categoryId: number;
     productId: number;
@@ -60,5 +61,5 @@ export interface QuantitySelectorProps {
   export interface ApiResponse {
     content: Product[];
     totalPages: number;
-    number: number;
-    }
+    number: number;
+  }

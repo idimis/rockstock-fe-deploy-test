@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import useProductDetail from "@/hooks/useProductDetail";
+import { useProductDetail } from "@/hooks/useProductDetail";
 import ImageCarousel from "@/components/products/ImageCarousel";
 import QuantitySelector from "@/components/products/QuantitySelector";
 import Navbar from "@/components/common/Navbar";
@@ -12,19 +12,19 @@ const ProductDetail = () => {
   const productId = Number(slug);
   const router = useRouter();
 
-  const { product, loading } = useProductDetail(productId);
+  const { data: product, isLoading } = useProductDetail(productId);
 
   useEffect(() => {
-    if (!loading && !product) {
+    if (!isLoading && !product) {
       const timer = setTimeout(() => {
         router.push("/products");
       }, 5000);
 
       return () => clearTimeout(timer);
     }
-  }, [loading, product, router]);
+  }, [isLoading, product, router]);
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <p className="text-gray-600 text-lg">Loading...</p>

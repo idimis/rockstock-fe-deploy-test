@@ -29,7 +29,7 @@ const useProducts = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:8080/api/v1/products?page=${currentPage - 1}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products?page=${currentPage - 1}`);
         const data: ApiResponse = await response.json();
         setProducts(data.content);
         setTotalPages(data.totalPages);

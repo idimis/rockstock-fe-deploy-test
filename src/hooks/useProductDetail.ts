@@ -1,39 +1,16 @@
-import { useState, useEffect } from "react";
+"use client";
 
-interface Product {
-  productId: number;
-  productName: string;
-  detail: string;
-  price: number;
-  weight: number;
-  totalStock: number;
-  productCategory: string;
-  productPictures: { productPictureUrl: string; position: number }[];
-}
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/utils/axiosInstance";
+import { Product } from "@/types/product";
 
-const useProductDetail = (id: number) => {
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const res = await fetch(`http://localhost:8080/api/v1/products/${id}`);
-        const data = await res.json();
-        setProduct(data);
-      } catch (error) {
-        console.error("Error fetching product details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) {
-      fetchProduct();
-    }
-  }, [id]);
-
-  return { product, loading };
+export const useProductDetail = (id: number) => {
+  return useQuery<Product>({
+    queryKey: ["productDetail", id],
+    queryFn: async () => {
+      const response = await axiosInstance.get(`/products/${id}`);
+      return response.data;
+    },
+    enabled: !!id,
+  });
 };
-
-export default useProductDetail;
