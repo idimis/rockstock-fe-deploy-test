@@ -57,7 +57,7 @@ const FeaturedProducts: React.FC = () => {
               <p className="text-sm text-gray-600 mt-2">{product.description}</p>
               <p className="text-xl font-bold text-black mt-2">{product.price}</p>
               <Link
-                href={`/product/${product.slug}`}
+                href={`/products/${product.slug}`}
                 className="mt-4 inline-block px-6 py-2 bg-red-600 text-white rounded-md text-sm hover:bg-black transition"
               >
                 View Product

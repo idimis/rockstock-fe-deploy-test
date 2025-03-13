@@ -45,7 +45,7 @@ const ProductCategories = () => {
   );
 
   const handleCategoryClick = (categoryId: number) => {
-    router.push(`/product?category=${categoryId}`);
+    router.push(`/products?category=${categoryId}`);
   };
 
   return (

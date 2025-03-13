@@ -12,7 +12,7 @@ const ProductCarousel = () => {
   const products: Product[] = productData?.content ?? [];
 
   const handleProductClick = (productId: number) => {
-    router.push(`/product/${productId}`);
+    router.push(`/products/${productId}`);
   };
 
   const truncateDescription = (text: string) => {

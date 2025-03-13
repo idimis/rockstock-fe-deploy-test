@@ -46,7 +46,7 @@ const ProductTable = () => {
       }
     });
   
-    router.push(`/product?${query.toString()}`);
+    router.push(`/products?${query.toString()}`);
   }; 
 
   const handlePageChange = (page: number) => {

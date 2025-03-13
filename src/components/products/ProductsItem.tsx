@@ -10,7 +10,7 @@ const ProductsItem: React.FC<ProductItemProps> = ({ product }) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/product/${product.productId}`);
+    router.push(`/products/${product.productId}`);
   };
 
   return (

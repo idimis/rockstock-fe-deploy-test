@@ -17,7 +17,7 @@ const ProductDetail = () => {
   useEffect(() => {
     if (!loading && !product) {
       const timer = setTimeout(() => {
-        router.push("/product");
+        router.push("/products");
       }, 5000);
 
       return () => clearTimeout(timer);
@@ -37,7 +37,7 @@ const ProductDetail = () => {
       <div className="flex flex-col items-center justify-center min-h-screen">
         <p className="text-gray-600 text-lg mb-4">Product not found.</p>
         <button
-          onClick={() => router.push("/product")}
+          onClick={() => router.push("/products")}
           className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
         >
           Go Back to Products

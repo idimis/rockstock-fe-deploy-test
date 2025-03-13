@@ -45,7 +45,7 @@ const NewestProducts: React.FC = () => {
             key={product.slug}
             className="relative border rounded-lg overflow-hidden group"
           >
-            <Link href={`/product/${product.slug}`}>
+            <Link href={`/products/${product.slug}`}>
               <Image
                 src={product.imageUrl}
                 alt={product.name}

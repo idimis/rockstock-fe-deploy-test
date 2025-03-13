@@ -42,7 +42,7 @@ const ProductsCust = () => {
       }
     });
   
-    router.push(`/product?${query.toString()}`);
+    router.push(`/products?${query.toString()}`);
   };  
 
   const handlePageChange = (page: number) => {
@@ -94,7 +94,7 @@ const ProductsCust = () => {
         currentPage={currentPage}
         totalPages={data?.totalPages ?? 1}
         onPageChange={handlePageChange}
-        basePath={"/product"}
+        basePath={"/products"}
       />
     </div>
   );
