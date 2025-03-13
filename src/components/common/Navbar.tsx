@@ -79,20 +79,20 @@ const Navbar: React.FC<NavbarProps> = () => {
   };
 
   const dashboardLinks: Record<UserRole, string> = {
-    Customer: "/dashboard/user",
+    "Customer": "/dashboard/user",
     "Super Admin": "/dashboard/admin",
     "Warehouse Admin": "/dashboard/admin",
   };
 
   const profileLinks: Record<UserRole, string> = {
-    Customer: "/dashboard/user/profile",
+    "Customer": "/dashboard/user/profile",
     "Super Admin": "/dashboard/admin/settings",
     "Warehouse Admin": "/dashboard/admin/settings",
   };
 
   return (
     <header className="bg-gray-100 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-6 flex justify-between items-center">
+      <div className="container mx-auto px-4 py-6 flex flex-col gap-4 justify-between items-center md:flex-row">
         {/* Logo */}
         <div>
           <Link href="/">
@@ -107,17 +107,15 @@ const Navbar: React.FC<NavbarProps> = () => {
         </div>
 
         {/* Search and account section */}
-        <div className="flex items-center space-x-8">
+        <div className="flex flex-col gap-4 items-center md:flex-row">
 
           {/* Search Bar */}
-          <div className="relative flex-1 max-w-lg ml-6">
-          <Suspense fallback={<div>Loading Product Cust...</div>}>
+          <div className="relative flex-1 max-w-lg">
+            <Suspense fallback={<div>Loading Product Cust...</div>}>
               <SearchBar basePath="/products" />
-              </Suspense>
-            </div>
-        </div>
-      </div>
-          
+            </Suspense>
+          </div>
+
           {/* Authentication Buttons */}
           {!accessToken ? (
             <div className="flex items-center space-x-2">
@@ -173,6 +171,8 @@ const Navbar: React.FC<NavbarProps> = () => {
               </div>
             </div>
           )}
+        </div>
+      </div>
     </header>
   );
 };

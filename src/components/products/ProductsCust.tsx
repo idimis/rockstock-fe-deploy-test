@@ -33,8 +33,8 @@ const ProductsCust = () => {
         value === null || 
         value === "" ||
         (key === "page" && value === 1) ||
-        (key === "sortField" && value === "name") || // Remove sortField=name always
-        (key === "sort" && value === "asc") // Remove sort=asc always
+        (key === "sortField" && value === "name") ||
+        (key === "sort" && value === "asc")
       ) {
         query.delete(key);
       } else {
