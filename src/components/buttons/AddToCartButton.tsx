@@ -2,60 +2,46 @@
 
 import { useState } from "react";
 import { AxiosError } from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { AddToCartButtonProps } from "@/types/cart";
 import { getAccessToken } from "@/lib/utils/auth";
 import { addToCart } from "@/services/cartService";
 
 const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }) => {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
   const accessToken = getAccessToken();
-  console.log("Button Product Id: ", productId);
-  
-  
+
   const handleAddToCart = async () => {
     if (!accessToken) {
-      setError("Please log in to add items to the cart.");
+      toast.error("Please log in to add items to the cart.");
       return;
     }
 
     setLoading(true);
-    setError(null);
-    setSuccess(false);
 
     try {
-      const response = await addToCart({
-          productId, quantity
-          // cartItemId: 0,
-          // totalAmount: 0,
-          // cartId: 0,
-          // productName: "",
-          // productImage: "",
-          // productPrice: 0,
-          // productWeight: 0,
-          // productPictures: null
-      });
+      const response = await addToCart({ productId, quantity });
+
       if (response.status === 200) {
-        setSuccess(true);
+        toast.success("Added to cart successfully!");
         window.dispatchEvent(new Event("storage"));
       }
     } catch (err: unknown) {
       const axiosError = err as AxiosError<{ message?: string }>;
-
-      console.error("Error adding to cart:", axiosError);
-      setError(
+      const errorMessage =
         axiosError.response?.data?.message === "Hit stock limit !"
           ? "You've reached the stock limit for this product!"
-          : axiosError.response?.data?.message || "Failed to add item to cart. Please try again."
-      );
+          : axiosError.response?.data?.message || "Failed to add item to cart. Please try again.";
+
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
+    <>
       <button
         onClick={handleAddToCart}
         disabled={loading || !accessToken}
@@ -66,9 +52,9 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }
         {loading ? "Adding..." : "Add to Cart"}
       </button>
 
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-      {success && <p className="text-green-500 mt-2">Added to cart successfully!</p>}
-    </div>
+      {/* Toast Container for notifications */}
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar closeOnClick pauseOnHover />
+    </>
   );
 };
 

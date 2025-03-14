@@ -13,7 +13,7 @@ interface AxiosErrorResponse {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const addToCart = async (payload: AddToCartButtonProps, attempt = 1): Promise<AxiosResponse> => {
+export const addToCart = async (payload: AddToCartButtonProps): Promise<AxiosResponse> => {
   try {
     const accessToken = getAccessToken();
     if (!accessToken) throw new Error("Unauthorized: No token provided");
@@ -32,15 +32,7 @@ export const addToCart = async (payload: AddToCartButtonProps, attempt = 1): Pro
   } catch (err: unknown) {
     const errorMessage = (err as unknown as { response?: { data?: { message?: string } } }).response?.data?.message || (err as Error).message;
     console.error("Error add to cart:", errorMessage);
-
-    if (errorMessage.includes("JDBC") && attempt <= 3) {
-      const retryDelay = Math.min(2 ** attempt * 1000, 30000);
-      console.warn(`Retrying addToCart in ${retryDelay / 1000}s...`);
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      return addToCart(payload, attempt + 1); // Ensure all parameters are passed
-    } else {
-      throw new Error(errorMessage || "Failed to add to cart");
-    }
+    throw new Error(errorMessage || "Failed to add to cart");
   }
 }
 
