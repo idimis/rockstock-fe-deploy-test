@@ -15,7 +15,7 @@ import Select from "react-select";
 // import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 interface Address {
-  addresId: number;
+  addressId: number;
   label: string;
   addressDetail: string;
   longitude: number;
@@ -227,21 +227,21 @@ const AddressPage = () => {
     }
   
     try {
-      await axios.put(
-        `${BACKEND_URL}/api/v1/addresses/change-main`,
+      await axios.patch(
+        `${BACKEND_URL}/api/v1/addresses/${addressId}/user/${userId}/set-main`, 
         null,
-        { params: { addressId }, headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } }
       );      
       console.log("Request success, refreshing addresses...");
       fetchUserAddresses();
     } catch (err) {
-  if (axios.isAxiosError(err)) {
-    console.error("Failed to set main address:", err.response?.data);
-  } else {
-    console.error("Unknown error:", err);
-  }
-}
-  };
+      if (axios.isAxiosError(err)) {
+        console.error("Failed to set main address:", err.response?.data);
+      } else {
+        console.error("Unknown error:", err);
+      }
+    }
+  };  
   
 
   // Update Address
@@ -251,7 +251,7 @@ const AddressPage = () => {
 
     try {
       await axios.put(
-        `${BACKEND_URL}/api/v1/addresses/${selectedAddress.addresId}/user/${userId}`,
+        `${BACKEND_URL}/api/v1/addresses/${selectedAddress.addressId}/user/${userId}`,
         selectedAddress,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -398,7 +398,7 @@ const AddressPage = () => {
                 {addresses.length > 0 ? (
                   addresses.map((address) => (
                     <li
-                      key={address.addresId}
+                      key={address.addressId}
                       className={`mt-2 p-4 rounded-xl border shadow-sm hover:shadow-md transition ${
                         address.isMain ? "bg-yellow-50 border-yellow-400" : "bg-white border-gray-300"
                       }`}
@@ -414,7 +414,7 @@ const AddressPage = () => {
                         {!address.isMain && (
                           <button
                             className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition hover:scale-105"
-                            onClick={() => setMainAddress(address.addresId)}
+                            onClick={() => setMainAddress(address.addressId)}
                           >
                             Set as Main
                           </button>
@@ -430,7 +430,7 @@ const AddressPage = () => {
                         </button>
                         <button
                           className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition hover:scale-105"
-                          onClick={() => deleteAddress(address.addresId)}
+                          onClick={() => deleteAddress(address.addressId)}
                         >
                           Delete
                         </button>

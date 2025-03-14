@@ -22,11 +22,12 @@ import { City, District, Province, SubDistrict } from "@/types/address";
 interface Warehouse {
   id: number;
   name: string;
-  addressDetail: string;
-  longitude: number;
-  latitude: number;
-  subDistrictId?: number
+  address: string; // Sesuai dengan backend
+  longitude: string; // Ubah ke string
+  latitude: string; // Ubah ke string
+  subDistrictId: number;
 }
+
 
 
 const Map = dynamic(() => import("@/components/common/Map"), { ssr: false });
@@ -140,8 +141,13 @@ const WarehousePage = () => {
   }, []);
 
   const handleMapClick = (lat: number, lng: number) => {
-    setNewWarehouse ((prev) => ({ ...prev, latitude: lat, longitude: lng }));
+    setNewWarehouse((prev) => ({
+      ...prev,
+      latitude: lat.toString(),  // Ensure latitude is a string
+      longitude: lng.toString(), // Ensure longitude is a string
+    }));
   };
+  
 
   // const fetchWarehouses = async () => {
   //   setLoading(true);
@@ -190,7 +196,7 @@ const WarehousePage = () => {
   }, [fetchWarehouses]);
   
   const createWarehouse = async () => {
-    if (!newWarehouse.name || !newWarehouse.addressDetail || !userLocation || !newWarehouse.subDistrictId) {
+    if (!newWarehouse.name || !newWarehouse.address || !newWarehouse.latitude || !newWarehouse.longitude || !newWarehouse.subDistrictId) {
       setError("All fields are required");
       return;
     }
@@ -202,25 +208,33 @@ const WarehousePage = () => {
       await axios.post(
         `${BACKEND_URL}/api/v1/warehouses`,
         { 
-          ...newWarehouse, 
-          latitude: userLocation.lat, 
-          longitude: userLocation.lng 
+          name: newWarehouse.name,
+          address: newWarehouse.address, 
+          latitude: newWarehouse.latitude.toString(),
+          longitude: newWarehouse.longitude.toString(), 
+          subDistrictId: newWarehouse.subDistrictId,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchWarehouses();
     } catch (err) {
       console.error("Failed to create warehouse", err);
+      setError("Failed to create warehouse");
     }
-  };    
+  };
+  
   
   const updateWarehouse = async () => {
     try {
       if (editingWarehouse) {
         console.log("Updating warehouse with data:", editingWarehouse);
         await axios.put(
-          `${BACKEND_URL}/api/v1/warehouse/${editingWarehouse.id}`, 
-          editingWarehouse
+          `${BACKEND_URL}/api/v1/warehouses/${editingWarehouse.id}`,
+          {
+            ...editingWarehouse,
+            latitude: editingWarehouse.latitude.toString(), 
+            longitude: editingWarehouse.longitude.toString(),
+          }
         );
         setEditingWarehouse(null);
       }
@@ -229,6 +243,7 @@ const WarehousePage = () => {
       console.error("Failed to update warehouse", err);
     }
   };
+  
   
   const deleteWarehouse = async (id: number) => {
     try {

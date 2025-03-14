@@ -48,8 +48,8 @@ const AdminPage = () => {
   };
 
   const createAdmin = async () => {
-    if (!newAdmin.fullname || !newAdmin.email || !newAdmin.role || !newAdmin.password) {
-      setError("All fields are required");
+    if (!newAdmin.fullname || !newAdmin.email || !newAdmin.password) {
+      setError("Fullname, Email, dan Password harus diisi");
       return;
     }
   
@@ -65,22 +65,26 @@ const AdminPage = () => {
   
     try {
       const response = await axios.post(
-        `${BACKEND_URL}/api/v1/admin`,
-        newAdmin,
+        `${BACKEND_URL}/api/v1/admin?role=Warehouse_Admin`, 
+        {
+          fullname: newAdmin.fullname,
+          email: newAdmin.email,
+          password: newAdmin.password, 
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
   
       console.log("Admin created:", response.data);
-      
-      // Tambahkan admin baru ke state langsung tanpa fetch ulang
-      setAdmins((prevAdmins) => [...prevAdmins, response.data]);
   
-      // Reset form
+      
+      fetchAdmins();
+  
+      
       setNewAdmin({ fullname: "", email: "", role: "", password: "" });
   
-      // Tutup modal jika ada
+      
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to create admin", error);
@@ -89,6 +93,7 @@ const AdminPage = () => {
       setLoading(false);
     }
   };
+  
   
   const updateAdmin = async () => {
     if (!editingAdmin) return;
