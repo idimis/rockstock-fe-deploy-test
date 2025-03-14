@@ -34,7 +34,6 @@ const Map = dynamic(() => import("@/components/common/Map"), { ssr: false });
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const WarehousePage = () => {
-  const [userId, setUserId] = useState<string | null>(null);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -106,30 +105,23 @@ const WarehousePage = () => {
 
   const provinceOptions = provinces.map((province) => ({
     value: province.id,
-    name: province.name,
+    label: province.name,
   }));
   
   const cityOptions = cities.map((city) => ({
     value: city.id,
-    name: city.name,
+    label: city.name,
   }));
   
   const districtOptions = districts.map((district) => ({
     value: district.id,
-    name: district.name,
+    label: district.name,
   }));
   
   const subDistrictOptions = subDistricts.map((subDistrict) => ({
     value: subDistrict.id,
-    name: subDistrict.name,
+    label: subDistrict.name,
   }));
-
-  useEffect(() => {
-    const storedUserId = localStorage.getItem("userId");
-    if (storedUserId) {
-      setUserId(storedUserId);
-    }
-  }, []);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
@@ -168,19 +160,18 @@ const WarehousePage = () => {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem("accessToken");
-    
-    if (!userId || !token) {
+  
+    if (!token) {
       setError("You are not logged in");
       setLoading(false);
       return;
     }
-
+  
     try {
       const response = await axios.get(`${BACKEND_URL}/api/v1/warehouses`, {
-        params: { userId },
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       if (response.data.success && response.data.data) {
         setWarehouses(response.data.data);
       } else {
@@ -192,14 +183,12 @@ const WarehousePage = () => {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
-
+  }, []);
+  
   useEffect(() => {
-    if (userId) {
-      fetchWarehouses();
-    }
-  }, [userId, fetchWarehouses]);
-
+    fetchWarehouses();
+  }, [fetchWarehouses]);
+  
   const createWarehouse = async () => {
     if (!newWarehouse.name || !newWarehouse.addressDetail || !userLocation || !newWarehouse.subDistrictId) {
       setError("All fields are required");
@@ -207,14 +196,13 @@ const WarehousePage = () => {
     }
   
     const token = localStorage.getItem("accessToken");
-    if (!userId || !token) return;
+    if (!token) return;
   
     try {
       await axios.post(
         `${BACKEND_URL}/api/v1/warehouses`,
         { 
           ...newWarehouse, 
-          userId, 
           latitude: userLocation.lat, 
           longitude: userLocation.lng 
         },
@@ -225,7 +213,7 @@ const WarehousePage = () => {
       console.error("Failed to create warehouse", err);
     }
   };    
-
+  
   const updateWarehouse = async () => {
     try {
       if (editingWarehouse) {
@@ -242,8 +230,6 @@ const WarehousePage = () => {
     }
   };
   
-  
-
   const deleteWarehouse = async (id: number) => {
     try {
       await axios.delete(`${BACKEND_URL}/api/v1/warehouse/${id}`);
@@ -252,6 +238,7 @@ const WarehousePage = () => {
       console.error("Failed to delete warehouse", err);
     }
   };
+  
 
 
   return (
@@ -287,7 +274,7 @@ const WarehousePage = () => {
               <label className="block mb-2 text-sm font-medium text-gray-700">Select Province:</label>
               <Select
                 options={provinceOptions}
-                value={selectedProvince ? { value: selectedProvince.id, name: selectedProvince.name } : null}
+                value={selectedProvince ? { value: selectedProvince.id, label: selectedProvince.name } : null}
                 onChange={(selectedOption) => {
                   if (selectedOption) {
                     const province = provinces.find((p) => p.id === selectedOption.value) || null;
@@ -305,7 +292,7 @@ const WarehousePage = () => {
               <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select City:</label>
               <Select
                 options={cityOptions}
-                value={selectedCity ? { value: selectedCity.id, name: selectedCity.name } : null}
+                value={selectedCity ? { value: selectedCity.id, label: selectedCity.name } : null}
                 onChange={(selectedOption) => {
                   if (selectedOption) {
                     const city = cities.find((c) => c.id === selectedOption.value) || null;
@@ -324,7 +311,7 @@ const WarehousePage = () => {
               <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select District:</label>
               <Select
                 options={districtOptions}
-                value={selectedDistrict ? { value: selectedDistrict.id, name: selectedDistrict.name } : null}
+                value={selectedDistrict ? { value: selectedDistrict.id, label: selectedDistrict.name } : null}
                 onChange={(selectedOption) => {
                   if (selectedOption) {
                     const district = districts.find((d) => d.id === selectedOption.value) || null;
@@ -343,7 +330,7 @@ const WarehousePage = () => {
               <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select Sub District:</label>
               <Select
                 options={subDistrictOptions}
-                value={selectedSubDistrict ? { value: selectedSubDistrict.id, name: selectedSubDistrict.name } : null}
+                value={selectedSubDistrict ? { value: selectedSubDistrict.id, label: selectedSubDistrict.name } : null}
                 onChange={(selectedOption) => {
                   if (selectedOption) {
                     const subDistrict = subDistricts.find((s) => s.id === selectedOption.value) || null;

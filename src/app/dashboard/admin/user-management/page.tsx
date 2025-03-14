@@ -48,61 +48,121 @@ const AdminPage = () => {
   };
 
   const createAdmin = async () => {
-    try {
-      await axios.post(`${BACKEND_URL}/api/v1/admin`, newAdmin);
-      setNewAdmin({ fullname: "", email: "", role: "", password: "" });
-      fetchAdmins();
-    } catch {
-      console.error("Failed to create admin");
+    if (!newAdmin.fullname || !newAdmin.email || !newAdmin.role || !newAdmin.password) {
+      setError("All fields are required");
+      return;
     }
-  };
-
-  const updateAdmin = async () => {
-    try {
-      if (editingAdmin) {
-        console.log("Updating admin:", editingAdmin);
   
-        const payload = {
-          email: editingAdmin.email || undefined,
-          fullname: editingAdmin.fullname || undefined,
-          password: editingAdmin.password || undefined,
-          role: editingAdmin.role || undefined
-        };
+    setLoading(true);
+    setError(null);
   
-        await axios.put(`${BACKEND_URL}/api/v1/admin/${editingAdmin.id}`, payload);
-        setEditingAdmin(null);
-        setIsModalOpen(false);
-      }
-      fetchAdmins();
-    } catch {
-      console.error("Failed to update admin");
-      setError("Failed to update admin");
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("Unauthorized: No token found");
+      setLoading(false);
+      return;
     }
-  };
   
-
-  const deleteAdmin = async (id: number) => {
     try {
-        const confirmDelete = window.confirm('Are you sure you want to delete this admin?');
-        if (confirmDelete) {
-            await axios.put(`${BACKEND_URL}/api/v1/admin/soft-delete/${id}`);
-            // Hapus admin dari state secara langsung
-            setAdmins(prevAdmins => prevAdmins.filter(admin => admin.id !== id));
+      const response = await axios.post(
+        `${BACKEND_URL}/api/v1/admin`,
+        newAdmin,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-    } catch (err) {
-        console.error('Failed to delete admin', err);
-        setError('Failed to delete admin');
+      );
+  
+      console.log("Admin created:", response.data);
+      
+      // Tambahkan admin baru ke state langsung tanpa fetch ulang
+      setAdmins((prevAdmins) => [...prevAdmins, response.data]);
+  
+      // Reset form
+      setNewAdmin({ fullname: "", email: "", role: "", password: "" });
+  
+      // Tutup modal jika ada
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Failed to create admin", error);
+      setError("Failed to create admin. Please try again.");
+    } finally {
+      setLoading(false);
     }
-};
-
+  };
   
-   
-
+  const updateAdmin = async () => {
+    if (!editingAdmin) return;
   
+    setLoading(true);
+    setError(null);
   
-  useEffect(() => {
-    fetchAdmins();
-  }, []);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("Unauthorized: No token found");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      const payload = {
+        email: editingAdmin.email || undefined,
+        fullname: editingAdmin.fullname || undefined,
+        password: editingAdmin.password || undefined,
+        role: editingAdmin.role || undefined,
+      };
+  
+      await axios.put(
+        `${BACKEND_URL}/api/v1/admin/${editingAdmin.id}`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      setEditingAdmin(null);
+      setIsModalOpen(false);
+  
+      fetchAdmins();
+    } catch (error) {
+      console.error("Failed to update admin", error);
+      setError("Failed to update admin. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  const deleteAdmin = async (id: number) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this admin?");
+    if (!confirmDelete) return;
+  
+    setLoading(true);
+    setError(null);
+  
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("Unauthorized: No token found");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      await axios.put(
+        `${BACKEND_URL}/api/v1/admin/soft-delete/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+  
+      // Hapus admin dari state langsung tanpa fetch ulang
+      setAdmins((prevAdmins) => prevAdmins.filter((admin) => admin.id !== id));
+    } catch (error) {
+      console.error("Failed to delete admin", error);
+      setError("Failed to delete admin. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
   
 
   return (
