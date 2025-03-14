@@ -176,7 +176,7 @@ const WarehousePage = () => {
     }
 
     try {
-      const response = await axios.get(`${BACKEND_URL}/api/v1/warehouses/users`, {
+      const response = await axios.get(`${BACKEND_URL}/api/v1/warehouses`, {
         params: { userId },
         headers: { Authorization: `Bearer ${token}` },
       });
