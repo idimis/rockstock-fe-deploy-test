@@ -218,7 +218,7 @@ const AddressPage = () => {
   };
   
   const setMainAddress = async (addressId: number) => {
-    console.log("Setting main address, ID:", addressId); // Tambahkan ini untuk debug
+    console.log("Setting main address, ID:", addressId);
   
     const token = localStorage.getItem("accessToken");
     if (!userId || !token) {
@@ -227,16 +227,20 @@ const AddressPage = () => {
     }
   
     try {
-      await axios.patch(
-        `${BACKEND_URL}/api/v1/addresses/${addressId}/user/${userId}/set-main`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.put(
+        `${BACKEND_URL}/api/v1/addresses/change-main`,
+        null,
+        { params: { addressId }, headers: { Authorization: `Bearer ${token}` } }
+      );      
       console.log("Request success, refreshing addresses...");
       fetchUserAddresses();
     } catch (err) {
-      console.error("Failed to set main address", err);
-    }
+  if (axios.isAxiosError(err)) {
+    console.error("Failed to set main address:", err.response?.data);
+  } else {
+    console.error("Unknown error:", err);
+  }
+}
   };
   
 
