@@ -64,27 +64,21 @@ const AdminPage = () => {
     }
   
     try {
+     
       const response = await axios.post(
         `${BACKEND_URL}/api/v1/admin?role=Warehouse_Admin`, 
         {
           fullname: newAdmin.fullname,
           email: newAdmin.email,
-          password: newAdmin.password, 
+          password: newAdmin.password,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-  
       console.log("Admin created:", response.data);
-  
-      
       fetchAdmins();
-  
-      
       setNewAdmin({ fullname: "", email: "", role: "", password: "" });
-  
-      
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to create admin", error);
@@ -93,6 +87,7 @@ const AdminPage = () => {
       setLoading(false);
     }
   };
+  
   
   
   const updateAdmin = async () => {

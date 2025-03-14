@@ -22,12 +22,11 @@ import { City, District, Province, SubDistrict } from "@/types/address";
 interface Warehouse {
   id: number;
   name: string;
-  address: string; // Sesuai dengan backend
-  longitude: string; // Ubah ke string
-  latitude: string; // Ubah ke string
+  address: string; 
+  longitude: string; 
+  latitude: string; 
   subDistrictId: number;
 }
-
 
 
 const Map = dynamic(() => import("@/components/common/Map"), { ssr: false });
@@ -178,8 +177,9 @@ const WarehousePage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
   
-      if (response.data.success && response.data.data) {
-        setWarehouses(response.data.data);
+      // Assumes response.data is an array of warehouses
+      if (response.data && Array.isArray(response.data)) {
+        setWarehouses(response.data);
       } else {
         setError("Failed to retrieve warehouse data");
       }
@@ -191,9 +191,6 @@ const WarehousePage = () => {
     }
   }, []);
   
-  useEffect(() => {
-    fetchWarehouses();
-  }, [fetchWarehouses]);
   
   const createWarehouse = async () => {
     if (!newWarehouse.name || !newWarehouse.address || !newWarehouse.latitude || !newWarehouse.longitude || !newWarehouse.subDistrictId) {
@@ -205,7 +202,7 @@ const WarehousePage = () => {
     if (!token) return;
   
     try {
-      await axios.post(
+      const response = await axios.post(
         `${BACKEND_URL}/api/v1/warehouses`,
         { 
           name: newWarehouse.name,
@@ -216,7 +213,13 @@ const WarehousePage = () => {
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      fetchWarehouses();
+  
+      // Make sure the backend response has a created warehouse
+      if (response.data) {
+        fetchWarehouses();  // Refresh warehouse data
+      } else {
+        setError("Failed to create warehouse");
+      }
     } catch (err) {
       console.error("Failed to create warehouse", err);
       setError("Failed to create warehouse");
