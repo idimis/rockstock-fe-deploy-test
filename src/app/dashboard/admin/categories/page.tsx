@@ -23,7 +23,7 @@ const AdminCategory = () => {
         {/* Sidebar */}
         <Sidebar />
         
-        <main className="flex-grow p-6 shadow-md">       
+        <main className="flex-grow p-6 shadow-md overflow-hidden">
           {/* CategoryTable */}
           <Suspense fallback={<div>Loading Product Cust...</div>}>
           <CategoryTable />

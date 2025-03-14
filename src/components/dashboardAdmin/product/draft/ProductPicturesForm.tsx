@@ -51,6 +51,9 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
         setLocalProductPictures(newPictures);
         updateFormik(newPictures);
 
+        formik.setFieldValue("productPictures", newPictures);
+        formik.validateField("productPictures");
+
         toast.success("Picture uploaded successfully!");
       } catch {
         toast.error("Failed to upload picture");
@@ -91,8 +94,8 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
                   alt={`Product ${position + 1}`}
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="rounded"
-                />
+                  className="object-cover rounded-lg w-full h-full"
+                  />
                 <button
                   type="button"
                   className={`absolute top-1 right-1 p-1 text-white rounded-full transition ${
@@ -119,9 +122,13 @@ const ProductPicturesForm: FC<ProductPicturesProps> = ({
           </div>
         ))}
       </div>
-      {formik.errors.productPictures && typeof formik.errors.productPictures === "string" && (
-            <div className="text-red-500 text-sm mt-1">{formik.errors.productPictures}</div>
-      )}
+        {formik.errors.productPictures && (
+          <div className="text-red-500 text-sm mt-1">
+            {Array.isArray(formik.errors.productPictures)
+              ? formik.errors.productPictures[0]
+              : formik.errors.productPictures}
+          </div>
+        )}
     </div>
   );
 };

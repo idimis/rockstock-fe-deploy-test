@@ -27,12 +27,14 @@ const AdminSidebar = () => {
         <SidebarSection 
           title="📦 Stock & Inventory" 
           links={[
-            { name: "Manage Stock", path: "/dashboard/admin/stock" }
+            { name: "Manage Stocks", path: "/dashboard/admin/stocks" },
+            { name: "Mutation Journals", path: "/dashboard/admin/journals" }
           ]}
         />
         <SidebarSection 
           title="🛒 Product Management" 
           links={[
+            { name: "Manage Categories", path: "/dashboard/admin/categories" },
             { name: "Manage Products", path: "/dashboard/admin/products" }
           ]}
         />

@@ -77,8 +77,8 @@ const CategoryModal: React.FC<{
 
   return (
     isOpen && (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-        <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 w-full h-full">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg max-w-sm w-full mx-auto">
           <h2 className="text-xl font-semibold mb-4">
             {category ? "Edit Category" : "Create Category"}
           </h2>
@@ -130,10 +130,10 @@ const CategoryModal: React.FC<{
                       src={imagePreview} 
                       alt="Preview" 
                       layout="cover" 
-                      width={100}
-                      height={100}
-                      objectFit="contain" 
-                    />
+                      width={300}
+                      height={300}
+                      className="object-cover rounded-lg w-full h-full"
+                      />
                   </div>
                 )}
                 </div>

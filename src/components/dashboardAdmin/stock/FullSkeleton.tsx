@@ -1,5 +1,6 @@
 const FullSkeleton = () => {
     return (
+      <div className="p-6 bg-white shadow-md rounded-lg space-y-6 animate-pulse">
         <div className="space-y-4">
           {Array.from({ length: 1 }).map((_, index) => ( 
             <div
@@ -28,6 +29,7 @@ const FullSkeleton = () => {
             </div>
           ))}
         </div>
+      </div>
     );
   };
   

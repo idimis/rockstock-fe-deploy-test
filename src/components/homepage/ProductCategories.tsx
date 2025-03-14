@@ -7,10 +7,21 @@ import { motion } from "framer-motion";
 import { useCategories } from "@/hooks/useCategories";
 import { Category } from "@/types/product";
 
+const SkeletonCard = () => (
+  <div className="relative w-[45%] md:w-[22%] h-48 md:h-72 rounded-lg overflow-hidden shadow-md flex-shrink-0 bg-gray-300 animate-pulse">
+    <div className="absolute inset-0 flex pb-4 md:pb-6 items-end justify-center">
+      <div className="bg-gray-200 rounded-full w-24 md:w-32 h-8 md:h-10" />
+    </div>
+  </div>
+);
+
 const ProductCategories = () => {
   const router = useRouter();
   const { data: categoryData } = useCategories(1, 20);
-  const categories: Category[] = useMemo(() => categoryData?.content ?? [], [categoryData]);
+  const categories: Category[] = useMemo(
+    () => categoryData?.content ?? [],
+    [categoryData]
+  );
 
   const [itemsPerPage, setItemsPerPage] = useState(2);
   const [index, setIndex] = useState<number>(0);
@@ -34,11 +45,10 @@ const ProductCategories = () => {
     (dir: "left" | "right") => {
       if (categories.length <= itemsPerPage) return;
       setDirection(dir);
-
       setIndex((prevIndex) =>
         dir === "right"
-          ? (prevIndex + itemsPerPage) % categories.length
-          : (prevIndex - itemsPerPage + categories.length) % categories.length
+          ? (prevIndex + 1) % categories.length
+          : (prevIndex - 1 + categories.length) % categories.length
       );
     },
     [categories, itemsPerPage]
@@ -47,6 +57,8 @@ const ProductCategories = () => {
   const handleCategoryClick = (categoryId: number) => {
     router.push(`/products?category=${categoryId}`);
   };
+
+  const isLoading = !categoryData;
 
   return (
     <section className="max-w-[1080px] mx-auto py-8 mb-8">
@@ -71,30 +83,38 @@ const ProductCategories = () => {
             transition={{ type: "spring", stiffness: 100, damping: 15 }}
             className="flex gap-4 md:gap-6 justify-center w-full"
           >
-            {categories.length > 0 &&
-              [...categories, ...categories]
-                .slice(index, index + itemsPerPage)
-                .map((category, i) => (
-                  <div
-                    key={category.categoryId || i}
-                    className="relative w-[45%] md:w-[22%] h-48 md:h-72 rounded-lg overflow-hidden shadow-md flex-shrink-0"
-                  >
-                    <Image
-                      src={category.categoryPicture || "/placeholder.jpg"}
-                      alt={category.categoryName}
-                      layout="fill"
-                      className="object-cover"
-                    />
-                    <div className="absolute inset-0 flex pb-4 md:pb-6 items-end justify-center">
-                      <button
-                        onClick={() => handleCategoryClick(category.categoryId)}
-                        className="text-gray-900 text-xs md:text-lg font-semibold bg-white min-w-[100px] md:min-w-[150px] h-8 md:h-10 flex items-center justify-center px-3 md:px-4 py-1 md:py-2 rounded-full transition-all hover:bg-black hover:text-white"
-                      >
-                        {category.categoryName}
-                      </button>
+            {isLoading
+              ?
+                Array.from({ length: itemsPerPage }).map((_, i) => (
+                  <SkeletonCard key={i} />
+                ))
+              :
+                categories.length > 0 &&
+                [...categories, ...categories]
+                  .slice(index, index + itemsPerPage)
+                  .map((category, i) => (
+                    <div
+                      key={category.categoryId || i}
+                      className="relative w-[45%] md:w-[22%] h-48 md:h-72 rounded-lg overflow-hidden shadow-md flex-shrink-0"
+                    >
+                      <Image
+                        src={category.categoryPicture || "/placeholder.jpg"}
+                        alt={category.categoryName}
+                        layout="fill"
+                        className="object-cover"
+                      />
+                      <div className="absolute inset-0 flex pb-4 md:pb-6 items-end justify-center">
+                        <button
+                          onClick={() =>
+                            handleCategoryClick(category.categoryId)
+                          }
+                          className="text-gray-900 text-xs md:text-lg font-semibold bg-white min-w-[100px] md:min-w-[150px] h-8 md:h-10 flex items-center justify-center px-3 md:px-4 py-1 md:py-2 rounded-full transition-all hover:bg-black hover:text-white"
+                        >
+                          {category.categoryName}
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
           </motion.div>
         </div>
 

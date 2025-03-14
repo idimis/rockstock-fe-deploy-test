@@ -21,8 +21,8 @@ const ProductFilter = ({
 
   useEffect(() => {
     const fetchCategories = async () => {
-        const response = await axiosInstance.get("/categories");
-        setCategories(response.data.data.content);
+      const response = await axiosInstance.get("/categories?page=0&size=15");
+      setCategories(response.data.data.content);
     };
     fetchCategories();
   }, []);

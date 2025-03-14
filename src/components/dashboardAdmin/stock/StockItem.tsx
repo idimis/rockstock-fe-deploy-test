@@ -4,32 +4,32 @@ import { MdEdit, MdDelete } from "react-icons/md";
 import axiosInstance from "@/utils/axiosInstance";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { Category } from "@/types/product";
 import { AxiosError } from "axios";
+import { Stock } from "@/types/stock";
 
-interface CategoryItemProps {
-  category: Category;
-  onEdit: (category: Category) => void;
+interface StockItemProps {
+  stock: Stock;
+  // onEdit: (stock: Stock) => void;
 }
 
-const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
+const StockItem: React.FC<StockItemProps> = ({ stock }) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      return axiosInstance.patch(`/categories/${category.categoryId}/delete`, {
-        categoryId: category.categoryId,
+      return axiosInstance.patch(`/stocks/${stock.stockId}/delete`, {
+        stockId: stock.stockId,
       });
     },
     onSuccess: () => {
-      toast.success("Category deleted successfully!");
+      toast.success("Stock deleted successfully!");
       setTimeout(() => {
         window.location.reload();
       }, 500);
     },
     onError: (error: unknown) => {
       const axiosError = error as AxiosError<{ message?: string }>;
-      const errorMessage = axiosError.response?.data?.message || "Failed to delete category";
+      const errorMessage = axiosError.response?.data?.message || "Failed to delete stock";
       toast.error(errorMessage);
     },
   });
@@ -37,29 +37,40 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
   return (
     <div className="flex flex-col md:flex-row items-center md:justify-between bg-gray-100 p-6 rounded-lg shadow-sm w-full">
       {/* Left Section: Image */}
-      <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
+      <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg bg-white border">
         <Image
-          src={category.categoryPicture}
-          alt={category.categoryName}
+          src={stock.productPictureUrl}
+          alt={stock.productName}
           width={400}
           height={400}
           className="object-cover rounded-lg w-full h-full"
         />
       </div>
 
-      {/* Middle Section: Name (Centered in mobile, left-aligned in PC) */}
-      <p className="mt-4 md:mt-0 md:ml-4 text-lg md:text-2xl font-medium text-gray-800 text-center md:text-left flex-1">
-        {category.categoryName}
-      </p>
+      {/* Middle Section: Stock Details */}
+      <div className="mt-4 md:mt-0 md:ml-4 flex-1">
+        <p className="text-lg md:text-2xl font-medium text-gray-800 text-center md:text-left">
+          {stock.productName}
+        </p>
+        <p className="text-md text-gray-600 text-center md:text-left">
+          Available: {stock.availableQuantity}
+        </p>
+        <p className="text-md text-gray-600 text-center md:text-left">
+          Locked: {stock.lockedQuantity}
+        </p>
+        <p className="text-sm text-gray-500 text-center md:text-left">
+          {stock.warehouseName}
+        </p>
+      </div>
 
-      {/* Right Section: Buttons (Centered in mobile, right-aligned in PC) */}
+      {/* Right Section: Buttons */}
       <div className="flex md:ml-auto space-x-4 md:space-x-8 mt-4 md:mt-0">
         <button
           className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-blue-600 hover:text-blue-800 transition"
-          onClick={() => onEdit(category)}
+          // onClick={() => onEdit(stock)}
         >
           <MdEdit className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">Edit</span>
+          <span className="hidden md:inline">Adjust Stock</span>
         </button>
         <button
           className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-red-600 hover:text-red-800 transition"
@@ -78,7 +89,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
               Do you really want
             </h2>
             <h2 className="text-xl font-semibold text-gray-900">
-              to delete this category?
+              to delete this stock?
             </h2>
             <div className="flex justify-center gap-6 mt-5">
               <button
@@ -102,4 +113,4 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
   );
 };
 
-export default CategoryItem;
+export default StockItem;
