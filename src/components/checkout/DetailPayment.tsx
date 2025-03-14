@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { formatCurrency } from "@/lib/utils/format";
-import { getAccessToken } from "@/lib/utils/auth";
 import { DetailPaymentProps } from "@/types/payment";
 import { toast } from "react-toastify";
 import { fetchPaymentMethods } from "@/services/paymentService";
@@ -17,17 +16,10 @@ const DetailPayment: React.FC<DetailPaymentProps> = ({
   selectedMethod, 
   setSelectedMethod 
 }) => {
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getPaymentMethods = async () => {
-      const accessToken = getAccessToken();
-      if (!accessToken) {
-        setError("Authentication error. Please log in again.");
-        return;
-      }
-
       try {
         setLoading(true);
         const paymentMethodData = await fetchPaymentMethods();
@@ -45,7 +37,7 @@ const DetailPayment: React.FC<DetailPaymentProps> = ({
     };
 
     getPaymentMethods();
-  }, [error, paymentMethods, setPaymentMethods]);
+  }, [paymentMethods, setPaymentMethods]);
 
   const handlePayNow = () => {
     if (!selectedMethod) {
