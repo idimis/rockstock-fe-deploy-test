@@ -9,7 +9,6 @@ import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import Image from "next/image";
-import dynamic from 'next/dynamic';
 
 interface Warehouse {
   id: number;
