@@ -51,11 +51,7 @@ const WarehouseMapPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
 
-  if (typeof window !== 'undefined') {
-    useEffect(() => {
-      fetchWarehouses();
-    }, []);
-
+  useEffect(() => {
     const fetchWarehouses = async () => {
       setLoading(true);
       setError(null);
@@ -68,7 +64,9 @@ const WarehouseMapPage = () => {
         setLoading(false);
       }
     };
-  }
+
+    fetchWarehouses();
+  }, []);
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-100 text-black">
