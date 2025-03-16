@@ -1,10 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
-import AdminSidebarPanel from "@/components/common/AdminSidebar";
 import axios from "axios";
 import { Combobox } from "@headlessui/react";
 
@@ -46,7 +42,7 @@ const AssignAdminPage = () => {
 
   const fetchWarehouses = async () => {
     try {
-      const response = await axios.get<Warehouse[]>(`${BACKEND_URL}/api/v1/warehouse`);
+      const response = await axios.get<Warehouse[]>(`${BACKEND_URL}/api/v1/warehouses`);
       setWarehouses(response.data);
     } catch {
       setError("Failed to fetch warehouses");
@@ -98,10 +94,8 @@ const AssignAdminPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-100 text-black">
-      <Header />
-      <Navbar />
+      
       <div className="flex flex-grow">
-        <AdminSidebarPanel />
         <div className="flex-grow p-6 bg-white shadow-lg rounded-xl">
           <h1 className="text-2xl font-bold mb-6">🏭 Warehouse Management</h1>
 
@@ -178,7 +172,7 @@ const AssignAdminPage = () => {
           </section>
         </div>
       </div>
-      <Footer />
+   
     </div>
   );
 };

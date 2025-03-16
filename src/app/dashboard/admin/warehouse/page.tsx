@@ -8,7 +8,7 @@ import AdminSidebarPanel from "@/components/common/AdminSidebar";
 import axios from "axios";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-// import { Warehouse } from "@/types/warehouse";
+import { Warehouse } from "@/types/warehouse";
 import {
   getProvinces,
   getCitiesByProvinceId,
@@ -17,16 +17,6 @@ import {
 } from "@/services/addressService";
 import Select from "react-select";
 import { City, District, Province, SubDistrict } from "@/types/address";
-
-
-interface Warehouse {
-  id: number;
-  name: string;
-  address: string; 
-  longitude: string; 
-  latitude: string; 
-  subDistrictId: number;
-}
 
 
 const Map = dynamic(() => import("@/components/common/Map"), { ssr: false });
@@ -142,89 +132,83 @@ const WarehousePage = () => {
   const handleMapClick = (lat: number, lng: number) => {
     setNewWarehouse((prev) => ({
       ...prev,
-      latitude: lat.toString(),  // Ensure latitude is a string
-      longitude: lng.toString(), // Ensure longitude is a string
+      latitude: lat.toString(),  
+      longitude: lng.toString(), 
     }));
   };
-  
-
-  // const fetchWarehouses = async () => {
-  //   setLoading(true);
-  //   setError(null);
-  //   try {
-  //     const response = await axios.get<Warehouse[]>(`${BACKEND_URL}/api/v1/warehouse`);
-  //     setWarehouses(response.data);
-  //   } catch {
-  //     setError("Failed to fetch warehouses");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const fetchWarehouses = useCallback(async () => {
     setLoading(true);
     setError(null);
     const token = localStorage.getItem("accessToken");
-  
+
+    console.log("Fetching warehouses...");
+    console.log("Token:", token);
+
     if (!token) {
       setError("You are not logged in");
       setLoading(false);
       return;
     }
-  
+
     try {
       const response = await axios.get(`${BACKEND_URL}/api/v1/warehouses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-  
-      // Assumes response.data is an array of warehouses
+
+      console.log("Response status:", response.status);
+      console.log("Response data:", response.data);
+
       if (response.data && Array.isArray(response.data)) {
         setWarehouses(response.data);
+        console.log("Warehouses set:", response.data);
       } else {
         setError("Failed to retrieve warehouse data");
+        console.error("Unexpected response format:", response.data);
       }
     } catch (err) {
       setError("Error fetching warehouses");
-      console.error(err);
+      console.error("Fetch error:", err);
     } finally {
       setLoading(false);
     }
   }, []);
-  
-  
+
+  useEffect(() => {
+    fetchWarehouses();
+  }, [fetchWarehouses]);
+
   const createWarehouse = async () => {
-    if (!newWarehouse.name || !newWarehouse.address || !newWarehouse.latitude || !newWarehouse.longitude || !newWarehouse.subDistrictId) {
-      setError("All fields are required");
-      return;
-    }
-  
-    const token = localStorage.getItem("accessToken");
-    if (!token) return;
-  
-    try {
-      const response = await axios.post(
-        `${BACKEND_URL}/api/v1/warehouses`,
-        { 
-          name: newWarehouse.name,
-          address: newWarehouse.address, 
-          latitude: newWarehouse.latitude.toString(),
-          longitude: newWarehouse.longitude.toString(), 
-          subDistrictId: newWarehouse.subDistrictId,
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-  
-      // Make sure the backend response has a created warehouse
-      if (response.data) {
-        fetchWarehouses();  // Refresh warehouse data
-      } else {
-        setError("Failed to create warehouse");
+    console.log("Creating warehouse with data:", newWarehouse); 
+    console.log("Final warehouse data before sending:", newWarehouse);
+    console.log("SubDistrict ID:", newWarehouse.subDistrictId);
+      if (!newWarehouse.name ||  !newWarehouse.address || !newWarehouse.latitude || !newWarehouse.longitude || !newWarehouse.subDistrictId) {
+        setError("All fields are required");
+        return;
       }
-    } catch (err) {
-      console.error("Failed to create warehouse", err);
-      setError("Failed to create warehouse");
-    }
-  };
+      
+    
+      const token = localStorage.getItem("accessToken");
+      if (!token) return;
+    
+      try {
+        await axios.post(
+          `${BACKEND_URL}/api/v1/warehouses`,
+          { 
+            name: newWarehouse.name,
+            address: newWarehouse.address, 
+            latitude: newWarehouse.latitude.toString(),
+            longitude: newWarehouse.longitude.toString(), 
+            subDistrictId: newWarehouse.subDistrictId,
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        fetchWarehouses();
+      } catch (err) {
+        console.error("Failed to create warehouse", err);
+      }
+    };
+    
   
   
   const updateWarehouse = async () => {
@@ -250,7 +234,7 @@ const WarehousePage = () => {
   
   const deleteWarehouse = async (id: number) => {
     try {
-      await axios.delete(`${BACKEND_URL}/api/v1/warehouse/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/v1/warehouses/${id}`);
       fetchWarehouses();
     } catch (err) {
       console.error("Failed to delete warehouse", err);
@@ -287,6 +271,13 @@ const WarehousePage = () => {
                     : setNewWarehouse({ ...newWarehouse, name: e.target.value })
                 }
               />
+
+            <input
+              type="text"
+              className="border p-2 w-full mb-2"
+              placeholder="Address Detail"
+              onChange={(e) => setNewWarehouse({ ...newWarehouse, address: e.target.value })}
+            />
   
               {/* Province Selection */}
               <label className="block mb-2 text-sm font-medium text-gray-700">Select Province:</label>
@@ -343,22 +334,24 @@ const WarehousePage = () => {
                 isDisabled={!selectedCity}
                 className="mt-2"
               />
-  
-              {/* Sub District Selection */}
+
+              {/* Sub District Select */}
               <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select Sub District:</label>
               <Select
                 options={subDistrictOptions}
                 value={selectedSubDistrict ? { value: selectedSubDistrict.id, label: selectedSubDistrict.name } : null}
                 onChange={(selectedOption) => {
                   if (selectedOption) {
+                    const subDistrictId = selectedOption.value
+                    setNewWarehouse({ ...newWarehouse, subDistrictId})
                     const subDistrict = subDistricts.find((s) => s.id === selectedOption.value) || null;
                     setSelectedSubDistrict(subDistrict);
                   }
                 }}
                 placeholder="Search and select a sub-district..."
                 isSearchable
-                isDisabled={!selectedDistrict}
                 className="mt-2"
+                isDisabled={!selectedDistrict}
               />
   
                   {/* Map Selection */}
@@ -379,77 +372,114 @@ const WarehousePage = () => {
               </button>
             </section>
   
-            {/* Warehouse List */}
-            <section className="p-6 border border-gray-200 rounded-lg shadow-md bg-white mt-6">
-              <h2 className="text-xl font-semibold mb-4">📋 Warehouse List</h2>
-              {loading ? (
-                <p className="text-center text-gray-500 animate-pulse">Loading...</p>
-              ) : (
-                <ul>
-                  {warehouses.map((warehouse) => (
-                    <li
-                      key={warehouse.id}
-                      className="p-4 bg-white rounded-lg shadow mb-2 flex justify-between items-center"
-                    >
-                      <div>
-                        <h3 className="font-semibold">{warehouse.name}</h3>
-                        <p className="text-gray-600">
-                          {warehouse.subDistrictId}, 
-                          {/* {warehouse.district}, {warehouse.city}, {warehouse.province} */}
-                        </p>
-                      </div>
-                      <div>
-                        <button
-                          className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95 mr-2"
-                          onClick={() => {
-                            setEditingWarehouse(warehouse);
-                            setIsModalOpen(true);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95"
-                          onClick={() => deleteWarehouse(warehouse.id)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </section>
-  
-            {/* Edit Warehouse Modal */}
-            {isModalOpen && editingWarehouse && (
-              <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-                <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                  <h2 className="text-xl font-bold mb-4">Edit Warehouse</h2>
-                  <input
-                    type="text"
-                    placeholder="Warehouse Name"
-                    className="border p-3 w-full rounded-lg mb-2"
-                    value={editingWarehouse.name}
-                    onChange={(e) =>
-                      setEditingWarehouse({ ...editingWarehouse, name: e.target.value })
-                    }
-                  />
-                  <div className="flex justify-end mt-4">
-                    <button className="bg-gray-400 text-white px-4 py-2 rounded-lg mr-2" onClick={() => setIsModalOpen(false)}>
-                      Cancel
-                    </button>
-                    <button className="bg-blue-500 text-white px-4 py-2 rounded-lg" onClick={() => updateWarehouse()}>
-                      Save
-                    </button>
-                  </div>
+      {/* Warehouse List */}
+      <section className="p-6 border border-gray-200 rounded-lg shadow-md bg-white mt-6">
+        <h2 className="text-xl font-semibold mb-4">📋 Warehouse List</h2>
+        {loading ? (
+          <p className="text-center text-gray-500 animate-pulse">Loading...</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <ul>
+            {warehouses.map((warehouse) => (
+              <li
+                key={warehouse.id}
+                className="p-4 bg-white rounded-lg shadow mb-2 flex justify-between items-center"
+              >
+                <div>
+                  <h3 className="font-semibold">{warehouse.name}</h3>
+                  <p className="text-gray-600">
+                    {warehouse.subDistrictId}, {warehouse.address},
+                  </p>
                 </div>
-              </div>
-            )}
-          </main>
+                <div>
+                  <button
+                    className="bg-yellow-500 text-white px-3 py-1 rounded-lg hover:bg-yellow-600 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95 mr-2"
+                    onClick={() => {
+                      setEditingWarehouse(warehouse);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="bg-red-500 text-white px-3 py-1 rounded-lg hover:bg-red-600 transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95"
+                    onClick={() => deleteWarehouse(warehouse.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {isModalOpen && editingWarehouse && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+      <h2 className="text-xl font-bold mb-4">Edit Warehouse</h2>
+      <input
+        type="text"
+        placeholder="Warehouse Name"
+        className="border p-3 w-full rounded-lg mb-2"
+        value={editingWarehouse.name}
+        onChange={(e) =>
+          setEditingWarehouse({ ...editingWarehouse, name: e.target.value })
+        }
+      />
+      <input
+        type="text"
+        placeholder="Address"
+        className="border p-3 w-full rounded-lg mb-2"
+        value={editingWarehouse.address}
+        onChange={(e) =>
+          setEditingWarehouse({ ...editingWarehouse, address: e.target.value })
+        }
+      />
+      <input
+        type="text"
+        placeholder="Longitude"
+        className="border p-3 w-full rounded-lg mb-2"
+        value={editingWarehouse.longitude}
+        onChange={(e) =>
+          setEditingWarehouse({ ...editingWarehouse, longitude: e.target.value })
+        }
+      />
+      <input
+        type="text"
+        placeholder="Latitude"
+        className="border p-3 w-full rounded-lg mb-2"
+        value={editingWarehouse.latitude}
+        onChange={(e) =>
+          setEditingWarehouse({ ...editingWarehouse, latitude: e.target.value })
+        }
+      />
+      <div className="flex justify-end mt-4">
+        <button
+          className="bg-gray-400 text-white px-4 py-2 rounded-lg mr-2"
+          onClick={() => setIsModalOpen(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+          onClick={() => {
+            updateWarehouse();
+            setIsModalOpen(false);
+          }}
+        >
+          Save
+            </button>
+            </div>
+          </div>       
+        </div>  
+      )}
+      </main>
         </div>
-        <Footer />
+        <Footer /> 
       </div>
+      
     );
   };
   

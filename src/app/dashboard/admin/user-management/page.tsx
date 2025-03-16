@@ -1,14 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
-import AdminSidebarPanel from "@/components/common/AdminSidebar";
 import axios from "axios";
 import Dialog from "@/components/ui/Dialog";
 import UserList from "@/components/common/user/UserList";
-   
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -123,46 +118,33 @@ const AdminPage = () => {
   };
   
   const deleteAdmin = async (id: number) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this admin?");
-    if (!confirmDelete) return;
-  
-    setLoading(true);
-    setError(null);
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      setError("Unauthorized: No token found");
-      setLoading(false);
-      return;
-    }
-  
-    const requesterId = localStorage.getItem("userId"); // Simpan userId saat login
-  
-    if (!requesterId) {
-      setError("Unauthorized: No requesterId found");
-      setLoading(false);
-      return;
-    }
-  
     try {
-      await axios.delete(`${BACKEND_URL}/api/v1/admin/${id}?requesterId=${requesterId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setAdmins((prevAdmins) => prevAdmins.filter((admin) => admin.id !== id));
-    } catch (error) {
-      console.error("Failed to delete admin", error);
-      setError("Failed to delete admin. Please try again.");
-    } finally {
-      setLoading(false);
+        const confirmDelete = window.confirm('Are you sure you want to delete this admin?');
+        if (confirmDelete) {
+            const token = localStorage.getItem("accessToken");
+            if (!token) {
+                setError("Unauthorized: No token found");
+                return;
+            }
+
+            await axios.put(`${BACKEND_URL}/api/v1/admin/soft-delete/${id}`, null, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            
+            setAdmins(prevAdmins => prevAdmins.filter(admin => admin.id !== id));
+        }
+    } catch (err) {
+        console.error('Failed to delete admin', err);
+        setError('Failed to delete admin');
     }
-  };
+};
+
   
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900">
-      <Header />
-      <Navbar />
       <div className="flex flex-grow">
-        <AdminSidebarPanel />
         <div className="flex-grow p-6 bg-white shadow-xl rounded-lg">
           <h1 className="text-3xl font-bold mb-6">👤 Manage Admin</h1>
           {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -222,7 +204,6 @@ const AdminPage = () => {
         </div>
       </div>
       </div>
-      <Footer />
     </div>
   );
 };

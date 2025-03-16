@@ -2,10 +2,6 @@
 
 import { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
-import UserSidebarPanel from "@/components/common/UserSidebar";
 import "leaflet/dist/leaflet.css"
 // import L from "leaflet";
 import axios from "axios";
@@ -281,10 +277,7 @@ const AddressPage = () => {
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-100 text-black">
-      <Header />
-      <Navbar />
       <div className="flex flex-grow">
-        <UserSidebarPanel />
         <main className="flex-grow p-6 bg-white shadow-md">
           <h1 className="text-2xl font-bold mb-4">📍 My Addresses</h1>
           <div className="p-6 bg-white shadow-md rounded-lg">
@@ -445,7 +438,6 @@ const AddressPage = () => {
           </div>
         </main>
     </div>
-    <Footer />
   
       {editModalOpen && selectedAddress && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Footer from "@/components/common/Footer";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -84,7 +83,6 @@ const ResetPasswordPage = () => {
       )}
 
       {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
-      <Footer />
     </div>
   );
 };

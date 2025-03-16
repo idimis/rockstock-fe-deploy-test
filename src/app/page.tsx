@@ -12,7 +12,6 @@ import NewestProducts from '@/components/homepage/NewestProducts';
 import Manifesto from '@/components/homepage/Manifesto';
 import ReviewSection from '@/components/homepage/ReviewSection';
 import ProductCarousel from '@/components/homepage/ProductCarousel';
-
 // import Testimonials from '@/components/homepage/Testimonials';
 
 

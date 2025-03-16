@@ -1,10 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
-import UserSidebar from "@/components/common/UserSidebar";
-import Footer from "@/components/common/Footer";
 import Image from "next/image";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -149,10 +145,7 @@ const UserProfilePage = () => {
 
   return (
     <>
-      <Header />
-      <Navbar />
       <div className="flex text-black min-h-screen bg-gray-100">
-        <UserSidebar />
         <div className="container mx-auto p-6">
           <h1 className="text-2xl font-bold mb-6">👤 User Profile</h1>
 
@@ -252,7 +245,6 @@ const UserProfilePage = () => {
           )}
         </div>
       </div>
-      <Footer />
     </>
   );
 };
