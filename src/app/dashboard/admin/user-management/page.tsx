@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/common/Header";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
@@ -16,7 +16,6 @@ interface Admin {
   id: number;
   fullname: string;
   email: string;
-  role: string;
   password?: string;
 }
 
@@ -28,24 +27,37 @@ const AdminPage = () => {
   const [newAdmin, setNewAdmin] = useState<Omit<Admin, "id">>({
     fullname: "",
     email: "",
-    role: "",
     password: "",
   });
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
 
   const fetchAdmins = async () => {
     setLoading(true);
     setError(null);
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setError("Unauthorized: No token found");
+      setLoading(false);
+      return;
+    }
     try {
-      const response = await axios.get<Admin[]>(`${BACKEND_URL}/api/v1/admin`);
+      const response = await axios.get<Admin[]>(`${BACKEND_URL}/api/v1/admin`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setAdmins(response.data);
-    } catch {
-      setError("Failed to fetch admins");
+    } catch (error) {
+      console.error("Error fetching admins:", error);
+      setError("Failed to fetch admins. Please check your network or token.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   const createAdmin = async () => {
     if (!newAdmin.fullname || !newAdmin.email || !newAdmin.password) {
@@ -53,9 +65,15 @@ const AdminPage = () => {
       return;
     }
   
+    const adminPayload = {
+      ...newAdmin,
+      role: "Warehouse Admin", 
+    };
+  
+    console.log("Sending payload:", adminPayload);
+  
     setLoading(true);
     setError(null);
-  
     const token = localStorage.getItem("accessToken");
     if (!token) {
       setError("Unauthorized: No token found");
@@ -64,21 +82,11 @@ const AdminPage = () => {
     }
   
     try {
-     
-      const response = await axios.post(
-        `${BACKEND_URL}/api/v1/admin?role=Warehouse_Admin`, 
-        {
-          fullname: newAdmin.fullname,
-          email: newAdmin.email,
-          password: newAdmin.password,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      console.log("Admin created:", response.data);
+      await axios.post(`${BACKEND_URL}/api/v1/admin`, adminPayload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchAdmins();
-      setNewAdmin({ fullname: "", email: "", role: "", password: "" });
+      setNewAdmin({ fullname: "", email: "", password: "" });
       setIsModalOpen(false);
     } catch (error) {
       console.error("Failed to create admin", error);
@@ -89,39 +97,22 @@ const AdminPage = () => {
   };
   
   
-  
   const updateAdmin = async () => {
     if (!editingAdmin) return;
-  
     setLoading(true);
     setError(null);
-  
     const token = localStorage.getItem("accessToken");
     if (!token) {
       setError("Unauthorized: No token found");
       setLoading(false);
       return;
     }
-  
     try {
-      const payload = {
-        email: editingAdmin.email || undefined,
-        fullname: editingAdmin.fullname || undefined,
-        password: editingAdmin.password || undefined,
-        role: editingAdmin.role || undefined,
-      };
-  
-      await axios.put(
-        `${BACKEND_URL}/api/v1/admin/${editingAdmin.id}`,
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-  
+      await axios.put(`${BACKEND_URL}/api/v1/admin/${editingAdmin.id}`, editingAdmin, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setEditingAdmin(null);
       setIsModalOpen(false);
-  
       fetchAdmins();
     } catch (error) {
       console.error("Failed to update admin", error);
@@ -137,7 +128,6 @@ const AdminPage = () => {
   
     setLoading(true);
     setError(null);
-  
     const token = localStorage.getItem("accessToken");
     if (!token) {
       setError("Unauthorized: No token found");
@@ -145,16 +135,18 @@ const AdminPage = () => {
       return;
     }
   
-    try {
-      await axios.put(
-        `${BACKEND_URL}/api/v1/admin/soft-delete/${id}`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    const requesterId = localStorage.getItem("userId"); // Simpan userId saat login
   
-      // Hapus admin dari state langsung tanpa fetch ulang
+    if (!requesterId) {
+      setError("Unauthorized: No requesterId found");
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      await axios.delete(`${BACKEND_URL}/api/v1/admin/${id}?requesterId=${requesterId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setAdmins((prevAdmins) => prevAdmins.filter((admin) => admin.id !== id));
     } catch (error) {
       console.error("Failed to delete admin", error);
@@ -179,7 +171,6 @@ const AdminPage = () => {
             <h2 className="text-lg font-semibold mb-2">➕ Add New Admin</h2>
             <input type="text" placeholder="Fullname" className="border p-2 mb-2 w-full rounded-lg" value={newAdmin.fullname} onChange={(e) => setNewAdmin({ ...newAdmin, fullname: e.target.value })} />
             <input type="email" placeholder="Email" className="border p-2 mb-2 w-full rounded-lg" value={newAdmin.email} onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })} />
-            <input type="text" placeholder="Role" className="border p-2 mb-2 w-full rounded-lg" value={newAdmin.role} onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })} />
             <input type="password" placeholder="Password" className="border p-2 mb-2 w-full rounded-lg" value={newAdmin.password} onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })} />
             <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg" onClick={createAdmin}>Create Admin</button>
           </div>
@@ -190,7 +181,7 @@ const AdminPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
   {admins.map((admin) => (
     <div key={admin.id} className="p-4 bg-white rounded-lg shadow-md">
-      <h3 className="text-lg font-semibold">{admin.fullname} ({admin.role})</h3>
+      <h3 className="text-lg font-semibold">{admin.fullname} </h3>
       <p className="text-sm text-gray-600">{admin.email}</p>
       <div className="mt-2 flex gap-2">
         <button 
@@ -201,7 +192,7 @@ const AdminPage = () => {
         </button>
         <button 
           className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600" 
-          onClick={() => deleteAdmin(admin.id)} // Panggil deleteAdmin saat tombol di-klik
+          onClick={() => deleteAdmin(admin.id)}
         >
           Delete
         </button>
@@ -216,7 +207,6 @@ const AdminPage = () => {
               <h2 className="text-xl font-semibold mb-4">✏️ Edit Admin</h2>
               <input type="text" placeholder="Fullname" className="input-field border rounded p-2" value={editingAdmin.fullname} onChange={(e) => setEditingAdmin({ ...editingAdmin, fullname: e.target.value })} />
               <input type="email" placeholder="Email" className="input-field border rounded p-2" value={editingAdmin.email} onChange={(e) => setEditingAdmin({ ...editingAdmin, email: e.target.value })} />
-              <input type="text" placeholder="Role" className="input-field border rounded p-2" value={editingAdmin.role} onChange={(e) => setEditingAdmin({ ...editingAdmin, role: e.target.value })} />
               <input type="password" placeholder="Password" className="input-field border rounded p-2" value={editingAdmin.password || ""} onChange={(e) => setEditingAdmin({ ...editingAdmin, password: e.target.value })} />
               <div className="flex justify-end gap-2 mt-4">
                 <button className="px-6 py-2 rounded-lg text-gray-700 bg-gray-300 hover:bg-gray-400" onClick={() => setIsModalOpen(false)}>Cancel</button>
@@ -224,6 +214,7 @@ const AdminPage = () => {
               </div>
             </Dialog>
           )}
+          
 
 <div className="p-6">
       <h4 className="text-2xl font-bold mb-4">Manage Users</h4>

@@ -28,7 +28,7 @@ const UserList = () => {
     const fetchUsers = async () => {
       try {
         const response = await axios.get<{ data: User[] }>(`${BACKEND_URL}/api/v1/user`);
-        console.log("API Response:", response.data); // Debugging
+        console.log("API Response:", response.data);
 
         if (Array.isArray(response.data)) {
           setUsers(response.data);
@@ -49,6 +49,9 @@ const UserList = () => {
 
   if (loading) return <p className="text-center text-gray-500">Loading users...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
+
+
+
 
   return (
     <div className="max-w-6xl mx-auto mt-6 p-4 bg-white rounded-lg shadow-md">
@@ -71,15 +74,28 @@ const UserList = () => {
             <tr key={user.id} className="border">
               <td className="border p-2 text-center">{index + 1}</td>
               <td className="border p-2 text-center">
-                <Image
-                  src={user.photoProfileUrl || user.googleImageUrl || "/default-avatar.png"}
-                  alt={user.fullname}
-                  className="w-10 h-10 rounded-full object-cover mx-auto"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = "";
-                    (e.target as HTMLImageElement).alt = "🧑";
-                  }}
-                />
+                {(user.photoProfileUrl || user.googleImageUrl) ? (
+                  <Image
+  src={user.photoProfileUrl || user.googleImageUrl || "/default-avatar.png"}
+  alt={user.fullname || "User Avatar"}
+  width={40}
+  height={40}
+  className="rounded-full object-cover"
+  onError={(e) => {
+    e.currentTarget.src = "/default-avatar.png";
+  }}
+/>
+
+) : (
+  <Image
+    src="/default-avatar.png"
+    alt="Default Avatar"
+    width={40}
+    height={40}
+    className="rounded-full object-cover"
+  />
+)}
+
               </td>
               <td className="border p-2">{user.fullname}</td>
               <td className="border p-2">{user.email}</td>

@@ -14,7 +14,7 @@ const AdminDashboard = () => {
     const storedFullname = localStorage.getItem("fullname");
     setFullname(storedFullname || "Admin");
 
-    // Mengambil JWT token jika ada di localStorage
+    
     const jwtToken = localStorage.getItem("jwt_token");
 
     if (jwtToken) {
