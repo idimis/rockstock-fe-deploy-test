@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
-import logoImage from "@/public/rockstockB&W.svg";
+import logoImage from "@/public/rockstock1.svg";
 import twitterIcon from '@/public/icons/twitter.png';
 import instagramIcon from '@/public/icons/instagram.png';
 import facebookIcon from '@/public/icons/facebook.jpg';
@@ -14,7 +14,7 @@ type FooterColumnProps = {
 
 const FooterColumn: React.FC<FooterColumnProps> = ({ title, children }) => (
   <div className="flex flex-col items-center md:items-start space-y-3 w-full sm:w-auto">
-    <h4 className="text-lg font-semibold text-white">{title}</h4>
+    <h4 className="text-lg font-semibold text-black">{title}</h4>
     {children}
   </div>
 );
@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
   const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   return (
-    <footer className="bg-gray-400 text-white py-10">
+    <footer className="bg-gray-200 text-black py-10">
       <div className="max-w-screen-xl mx-auto px-6">
 
         {/* Logo & Kolom Footer */}
