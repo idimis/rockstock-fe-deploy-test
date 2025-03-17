@@ -25,6 +25,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
   const [showCreateAddress, setShowCreateAddress] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshAddresses, setRefreshAddresses] = useState(false);
 
   const fetchWarehouses = useCallback(async () => {
     try {
@@ -44,7 +45,7 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
     if (!accessToken) return;
     setLoading(true);
     fetchAddresses(setDefaultAddress, setAddressId, setAddressPostalCode, setAddresses, setError, setLoading);
-  }, [setAddressId, setAddressPostalCode, setAddresses, setError]);
+  }, [refreshAddresses, setAddressId, setAddressPostalCode, setAddresses, setError]);
 
   useEffect(() => {
     fetchWarehouses();
@@ -83,12 +84,13 @@ const AddressComponent: React.FC<AddressComponentProps> = ({
 
   const handleOpenCreateAddress = () => {
     setShowPopup(false);
-    setShowCreateAddress(true)
+    setShowCreateAddress(true);
   }
 
   const handleCloseCreateAddress = () => {
     setShowPopup(true);
-    setShowCreateAddress(false)
+    setShowCreateAddress(false);
+    setRefreshAddresses((prev) => !prev); 
   }
 
   if (error) return <p className="text-red-500">{error}</p>;

@@ -13,7 +13,7 @@ import { getProvinces, getCitiesByProvinceId, getDistrictByCityId, getSubDistric
 import { Province, City, District, SubDistrict, CreateAddressProps, CreateAddressFormValues } from "@/types/address";
 import Select from "react-select";
 import { IoMdClose } from "react-icons/io";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const MapComponent = dynamic(() => import("@/components/common/MapComponent"), { ssr: false, loading: () => <p>Loading map...</p>, });
 
@@ -79,7 +79,7 @@ const CreateAddress: React.FC<CreateAddressProps> = ({ onCloseCreateAddress }) =
     } finally {
       setSubmitting(false);
       setLoading(false);
-      router.reload();
+      router.refresh();
     }
   };
 

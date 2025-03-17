@@ -36,6 +36,7 @@ const CheckoutPage = () => {
   const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingPayment, setLoadingPayment] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [selectedMethod, setSelectedMethod] = useState<number | null>(null);
@@ -98,7 +99,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    setLoading(true);
+    setLoadingPayment(true);
     try {
       const orderData: OrderResponse = await placeOrder(shippingFee, addressId, selectedMethod, accessToken);
       const orderId = orderData.id;
@@ -115,7 +116,7 @@ const CheckoutPage = () => {
       console.error("Error placing order:", error);
       toast.error("Failed to place order. Please try again.");
     } finally {
-      setLoading(false);
+      setLoadingPayment(false);
       setShowPopup(false);
     }
   };
@@ -170,7 +171,7 @@ const CheckoutPage = () => {
       {showPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            {loading ? (
+            {loadingPayment ? (
               <div className="flex justify-center items-center py-6">
                 <div className="flex flex-col items-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
@@ -193,12 +194,12 @@ const CheckoutPage = () => {
                   </button>
                   <button
                     className={`px-4 py-2 text-white font-bold rounded-lg w-full transition ${
-                      loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-500"
+                      loadingPayment ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-500"
                     }`}
                     onClick={handleConfirmPayment}
-                    disabled={loading}
+                    disabled={loadingPayment}
                   >
-                    {loading ? "Processing..." : "Confirm & Pay"}
+                    {loadingPayment ? "Processing..." : "Confirm & Pay"}
                   </button>
                 </div>
               </div>
