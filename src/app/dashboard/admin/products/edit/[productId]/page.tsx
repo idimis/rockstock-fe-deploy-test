@@ -73,9 +73,9 @@ const ProductEditForm = () => {
         setSubmitting(false);
         return;
       }
-    
+      const finalValues = { ...values, categoryId: values.productCategory };  
       try {
-        await axiosInstance.patch(`/products/${productId}/edit`, values);
+        await axiosInstance.patch(`/products/${productId}/edit`, finalValues);
         router.push("/dashboard/admin/products");
         localStorage.setItem("toastMessage", "Product edited successfully!");
       } catch (error: unknown) {

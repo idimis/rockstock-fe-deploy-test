@@ -51,12 +51,14 @@ const AdminSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         <SidebarMenu 
           title="📦 Stock & Inventory" 
           links={[
-            { name: "Manage Stock", path: "/dashboard/admin/stock" }
+            { name: "Manage Stocks", path: "/dashboard/admin/stocks" },
+            { name: "Mutation Journals", path: "/dashboard/admin/journals" }
           ]}
         />
         <SidebarMenu 
           title="🛒 Product Management" 
           links={[
+            { name: "Manage Categories", path: "/dashboard/admin/categories" },
             { name: "Manage Products", path: "/dashboard/admin/products" }
           ]}
         />

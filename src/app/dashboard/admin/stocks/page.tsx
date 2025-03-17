@@ -6,11 +6,11 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import ProductTable from "@/components/dashboardAdmin/product/ProductTable";
+import StockTable from "@/components/dashboardAdmin/stock/StockTable";
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const AdminProduct = () => {
+const AdminStock = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -35,10 +35,10 @@ const AdminProduct = () => {
         {/* Sidebar */}
         <Sidebar />
         
-        <main className="flex-grow p-6 shadow-md">       
-          {/* ProductTable */}
-          <Suspense fallback={<div>Loading Products Management...</div>}>
-            <ProductTable />
+        <main className="flex-grow p-6 shadow-md overflow-hidden">
+          {/* Stock Table */}
+          <Suspense fallback={<div>Loading Stocks Management...</div>}>
+            <StockTable />
           </Suspense>
         </main>
       </div>
@@ -49,4 +49,4 @@ const AdminProduct = () => {
   );
 };
 
-export default AdminProduct;
+export default AdminStock;

@@ -1,16 +1,21 @@
-const SkeletonRow = () => (
-  <div className="flex items-center justify-between bg-gray-100 p-4 rounded-lg shadow-sm animate-pulse">
-    <div className="w-14 h-14 bg-gray-300 rounded-lg"></div>
+import React from "react";
 
-    <div className="ml-4 space-y-2">
-      <div className="h-4 w-32 bg-gray-300 rounded"></div>
-      <div className="h-3 w-24 bg-gray-300 rounded"></div>
-    </div>
+const SkeletonRow = () => {
+  return (
+    <div className="flex flex-col md:flex-row items-center md:justify-between bg-gray-100 p-6 rounded-lg shadow-sm w-full animate-pulse">
+      {/* Image Placeholder */}
+      <div className="w-24 h-24 flex-shrink-0 bg-gray-300 rounded-lg"></div>
 
-    <div className="flex space-x-6">
-      <div className="w-20 h-8 bg-gray-300 rounded-lg"></div>
-      <div className="w-20 h-8 bg-gray-300 rounded-lg"></div>
+      {/* Category Name Placeholder */}
+      <div className="mt-4 md:mt-0 md:ml-4 w-3/4 md:w-1/3 h-6 bg-gray-300 rounded-md"></div>
+
+      {/* Buttons Placeholder */}
+      <div className="flex space-x-4 md:space-x-8 mt-4 md:mt-0">
+        <div className="w-16 h-6 bg-gray-300 rounded-md"></div>
+        <div className="w-16 h-6 bg-gray-300 rounded-md"></div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
 export default SkeletonRow;

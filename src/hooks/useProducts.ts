@@ -9,8 +9,8 @@ export const useProducts = (
   pageSize: number = 10,
   searchQuery: string,
   categoryId?: number | null,
-  sortField: string = "name",
-  sortDirection: string = "asc"
+  sortField: string = "updatedAt",
+  sortDirection: string = "desc"
 ) => {
   return useQuery<ApiResponse>({
     queryKey: ["products", page, pageSize, searchQuery, categoryId, sortField, sortDirection],

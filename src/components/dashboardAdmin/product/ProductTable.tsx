@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
 import FullSkeleton from "@/components/dashboardAdmin/product/common/FullSkeleton";
 import Pagination from "@/components/dashboardAdmin/Pagination";
-import SearchBar from "@/components/dashboardAdmin/SearchBar";
+import SearchBar from "@/components/dashboardAdmin/product/SearchBar";
 import ProductFilter from "@/components/dashboardAdmin/product/common/ProductFilter";
 import ProductItem from "@/components/dashboardAdmin/product/ProductItem";
 import { Product } from "@/types/product";
@@ -19,7 +19,7 @@ const ProductTable = () => {
   const categoryId = searchParams.get("category") ? Number(searchParams.get("category")) : null;
   const sortField = searchParams.get("sortField") || "name";
   const sortDirection = searchParams.get("sort") || "asc";
-  const pageSize = 10;
+  const pageSize = 4;
 
   const createDraftMutation = useCreateDraft();
   const { data, isLoading } = useProducts(currentPage, pageSize, searchQuery, categoryId !== null ? categoryId : undefined, sortField, sortDirection);
@@ -46,7 +46,7 @@ const ProductTable = () => {
       }
     });
   
-    router.push(`/products?${query.toString()}`);
+    router.push(`/dashboard/admin/products?${query.toString()}`);
   }; 
 
   const handlePageChange = (page: number) => {
@@ -97,7 +97,7 @@ const ProductTable = () => {
 
       <div className="space-y-4 mt-6">
         {isLoading ? (
-          Array.from({ length: 10 }).map((_, index) => <FullSkeleton key={index} />)
+          Array.from({ length: 4 }).map((_, index) => <FullSkeleton key={index} />)
         ) : (
           (data?.content ?? []).length > 0 ? (
             (data?.content ?? []).map((product: Product) => (

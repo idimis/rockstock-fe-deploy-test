@@ -6,6 +6,7 @@ import { useProductDetail } from "@/hooks/useProductDetail";
 import ImageCarousel from "@/components/products/ImageCarousel";
 import QuantitySelector from "@/components/products/QuantitySelector";
 import Navbar from "@/components/common/Navbar";
+import Footer from "@/components/common/Footer";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -88,6 +89,7 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </>
   );
 };

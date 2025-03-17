@@ -93,7 +93,9 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
       <div className="flex-grow text-center md:text-left">
         <h3 className="text-xl font-bold text-gray-900">{product.productName}</h3>
         <p className="text-sm text-blue-600">{product.categoryName}</p>
-        <p className="text-sm text-gray-700">Weight: {product.weight}g</p>
+        <p className="text-sm text-gray-700">
+          Weight: {product.weight >= 1000 ? `${product.weight / 1000} kg` : `${product.weight} g`}
+        </p>        
         <p className="text-sm font-semibold text-gray-900">
           Price: Rp {product.price.toLocaleString()}
         </p>
@@ -126,7 +128,10 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50  z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-full sm:max-w-lg w-1/2 sm:w-96 text-center">
             <h2 className="text-lg font-semibold text-gray-800">
-              Do you really want to delete this product?
+              Do you really want
+            </h2>
+            <h2 className="text-lg font-semibold text-gray-800">
+              to delete this product?
             </h2>
             <div className="flex justify-center gap-4 mt-4">
               <button

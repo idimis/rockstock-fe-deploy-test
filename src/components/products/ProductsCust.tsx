@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
-import FullSkeleton from "@/components/dashboardAdmin/product/common/FullSkeleton";
+import FullSkeleton from "@/components/products/FullSkeleton";
 import { Product } from "@/types/product";
 import ProductsPage from "@/components/products/ProductsPage";
 import ProductsFilter from "@/components/products/ProductFilter";
