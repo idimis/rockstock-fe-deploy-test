@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import axiosInstance from "@/utils/axiosInstance";
 import Select from "react-select";
 import { AiOutlineArrowUp, AiOutlineArrowDown } from "react-icons/ai";
+import { Warehouse } from "@/types/warehouse";
 
 const StockFilter = ({
   currentSortDirection,
@@ -14,32 +15,49 @@ const StockFilter = ({
   currentWarehouse?: number | null;
   handleFilterChange: (filters: { warehouse: number | null; sortDirection?: string }) => void;
 }) => {
-  const [warehouses, setWarehouses] = useState<{ warehouseId: number; warehouseName: string }[]>([]);
+  const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchWarehouses = async () => {
-      const response = await axiosInstance.get("/warehouses?page=0&size=15");
-      setWarehouses(response.data.data.content);
+      try {
+        const response = await axiosInstance.get("/warehouses");
+        console.log("API Response:", response.data);
+
+        const warehouseList = response.data ?? [];
+        console.log("Setting Warehouses:", warehouseList);
+
+        setWarehouses(warehouseList);
+      } catch (error) {
+        console.error("Error fetching warehouses:", error);
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchWarehouses();
   }, []);
 
   const warehouseOptions = [
     { value: null, label: "All Warehouses" },
     ...warehouses.map((warehouse) => ({
-      value: warehouse.warehouseId,
-      label: warehouse.warehouseName,
+      value: warehouse.id,
+      label: warehouse.name,
     })),
   ];
+
+  console.log("Warehouse Options:", warehouseOptions);
 
   return (
     <div className="flex flex-col md:flex-row md:items-center md:space-x-2 gap-4 mt-6">
       <div className="flex flex-col md:flex-row md:items-center md:space-x-2 w-full gap-4">
+        
         <div className="relative w-full md:w-64">
           <Select
             options={warehouseOptions}
             className="text-gray-500"
-            placeholder="Select Warehouse"
+            placeholder={loading ? "Loading warehouses..." : "Select Warehouse"}
+            isLoading={loading}
             isSearchable
             value={warehouseOptions.find((w) => w.value === currentWarehouse) || warehouseOptions[0]}
             onChange={(selectedOption) => {

@@ -35,8 +35,8 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
   });
 
   return (
-    <div className="flex flex-col md:flex-row items-center md:justify-between bg-gray-100 p-6 rounded-lg shadow-sm w-full">
-      {/* Left Section: Image */}
+    <div className="flex flex-col md:flex-row items-center md:justify-between bg-gray-100 p-6 rounded-lg shadow-sm w-full min-w-0">
+    {/* Left Section: Image */}
       <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-lg">
         <Image
           src={category.categoryPicture}
@@ -53,20 +53,17 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
       </p>
 
       {/* Right Section: Buttons (Centered in mobile, right-aligned in PC) */}
-      <div className="flex md:ml-auto space-x-4 md:space-x-8 mt-4 md:mt-0">
-        <button
-          className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-blue-600 hover:text-blue-800 transition"
-          onClick={() => onEdit(category)}
-        >
+      <div className="flex flex-wrap md:ml-auto space-x-2 md:space-x-8 mt-4 md:mt-0 justify-center md:justify-end">
+        <button className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-blue-600 hover:text-blue-800 transition" onClick={() => onEdit(category)}>
           <MdEdit className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">Edit</span>
+          <span className="hidden lg:inline">Edit</span>
         </button>
-        <button
+        <button 
           className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-red-600 hover:text-red-800 transition"
           onClick={() => setIsConfirmOpen(true)}
         >
           <MdDelete className="text-xl md:text-2xl" />
-          <span className="hidden md:inline">Delete</span>
+          <span className="hidden lg:inline">Delete</span>
         </button>
       </div>
 

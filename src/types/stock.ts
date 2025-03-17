@@ -1,4 +1,5 @@
 export interface Stock {
+  quantity: number;
   stockId: number;
   stockQuantity: number;
   lockedQuantity: number;

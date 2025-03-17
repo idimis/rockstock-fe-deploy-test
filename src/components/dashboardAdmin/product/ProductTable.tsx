@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
 import FullSkeleton from "@/components/dashboardAdmin/product/common/FullSkeleton";
 import Pagination from "@/components/dashboardAdmin/Pagination";
-import SearchBar from "@/components/dashboardAdmin/SearchBar";
+import SearchBar from "@/components/dashboardAdmin/product/SearchBar";
 import ProductFilter from "@/components/dashboardAdmin/product/common/ProductFilter";
 import ProductItem from "@/components/dashboardAdmin/product/ProductItem";
 import { Product } from "@/types/product";

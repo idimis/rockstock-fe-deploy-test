@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useCategories } from "@/hooks/useCategories";
 import SkeletonRow from "@/components/dashboardAdmin/category/SkeletonRow";
 import Pagination from "@/components/dashboardAdmin/Pagination";
-import SearchBar from "@/components/dashboardAdmin/SearchBar";
+import SearchBar from "@/components/dashboardAdmin/category/SearchBar";
 import { useState, useEffect, Suspense } from "react";
 import CategoryModal from "@/components/dashboardAdmin/category/CategoryModal";
 import CategoryItem from "@/components/dashboardAdmin/category/CategoryItem";
@@ -58,8 +58,8 @@ const CategoryTable = () => {
         </div>
       </div>
 
-      <div className="w-full md:w-auto flex md:justify-end">
-        <Suspense fallback={<div>Loading Product Cust...</div>}>
+      <div className="w-full md:w-full flex md:justify-end">
+        <Suspense fallback={<div>Loading Category Management...</div>}>
           <SearchBar basePath="/dashboard/admin/categories"/>
         </Suspense>
       </div>

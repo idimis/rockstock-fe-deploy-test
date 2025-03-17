@@ -1,87 +1,110 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useStocks } from "@/hooks/useStocks";
-import SkeletonRow from "@/components/dashboardAdmin/category/SkeletonRow";
+import StockItemSkeleton from "@/components/dashboardAdmin/stock/StockItemSkeleton";
 import Pagination from "@/components/dashboardAdmin/Pagination";
-import SearchBar from "@/components/dashboardAdmin/SearchBar";
-import { useState, useEffect, Suspense } from "react";
-import StockModal from "@/components/dashboardAdmin/stock/StockModal";
+import SearchBar from "@/components/dashboardAdmin/stock/SearchBar";
 import StockItem from "@/components/dashboardAdmin/stock/StockItem";
+import StockFilter from "@/components/dashboardAdmin/stock/StockFilter";
+import { useState, useEffect, Suspense } from "react";
 import { Stock } from "@/types/stock";
+import AdjustStockModal from "@/components/dashboardAdmin/stock/AdjustStockModal";
+import CreateStockModal from "@/components/dashboardAdmin/stock/CreateStockModal";
 
 const StockTable = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
   const currentPage = Number(searchParams.get("page")) || 1;
   const searchQuery = searchParams.get("search") || "";
-  const pageSize = 10;
+  const warehouseId = searchParams.get("warehouse");
+  const pageSize = 5;
 
-  const [isFetching, setIsFetching] = useState(true);
-  const { data, isLoading } = useStocks(currentPage, pageSize, searchQuery);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [editingStock, setEditingStock] = useState<Stock | null>(null);
+  const [selectedWarehouse, setSelectedWarehouse] = useState<number | null>(null);
+  const [sortDirection, setSortDirection] = useState<string>("asc");
+
+  const { data, isLoading, refetch } = useStocks(currentPage, pageSize, searchQuery, selectedWarehouse, sortDirection);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingStock, setEditingStock] = useState<Stock | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIsFetching(false);
-    }, 1000);
+    if (warehouseId) {
+      setSelectedWarehouse(Number(warehouseId));
+    }
+  }, [warehouseId]);
 
-    if (!isLoading) {
-      setIsFetching(false);
-      clearTimeout(timeout);
+  const handleFilterChange = (filters: { warehouse?: number | null; sortDirection?: string }) => {
+    setSelectedWarehouse(filters.warehouse ?? null);
+    setSortDirection(filters.sortDirection || sortDirection);
+
+    const params = new URLSearchParams();
+    if (filters.warehouse) params.set("warehouse", String(filters.warehouse));
+    if (filters.sortDirection && filters.sortDirection !== "asc") {
+      params.set("sort", filters.sortDirection);
+    }
+    if (searchQuery) params.set("search", searchQuery);
+
+    if (!searchParams.has("page")) {
+      params.set("page", String(currentPage));
     }
 
-    return () => clearTimeout(timeout);
-  }, [isLoading]);
-
-  const updatePage = (page: number) => {
-    setIsFetching(true);
-    window.location.href = `/dashboard/admin/stocks?page=${page}&search=${searchQuery}`;
+    router.push(`/dashboard/admin/stocks?${params.toString()}`);
   };
+
+  const refreshStocks = () => {
+    refetch();
+  };
+
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-        <h2 className="text-xl md:text-4xl text-center font-semibold text-gray-800 mb-6 md:mb-0">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 justify-center">
+        <h2 className="text-2xl md:text-4xl text-center font-semibold text-gray-800 mb-6 md:mb-0">
           📦 Stock Management
         </h2>
         <div className="flex justify-center md:justify-end w-full md:w-auto">
-        <button 
-          className="bg-blue-500 text-xl text-white px-2 py-2 rounded w-2/3 md:w-48"
-          // onClick={() => {
-          //   setEditingStock(null);
-          //   setIsModalOpen(true);
-          // }}
-        >
-          Create Stock
-        </button>
+          <button
+            className="bg-blue-500 text-xl text-white px-2 py-2 rounded w-2/3 md:w-48"
+            onClick={() => setIsCreateModalOpen(true)}
+          >
+            Create Stock
+          </button>
         </div>
       </div>
 
-      <div className="w-full md:w-auto flex md:justify-end">
-        <Suspense fallback={<div>Loading Stock Management...</div>}>
-          <SearchBar basePath="/dashboard/admin/stocks"/>
-        </Suspense>
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="w-full">
+          <StockFilter
+            currentSortDirection={sortDirection}
+            currentWarehouse={selectedWarehouse}
+            handleFilterChange={handleFilterChange}
+          />
+        </div>
+        <div className="w-full md:w-1/2 flex md:justify-end">
+          <Suspense fallback={<div>Loading Stocks Management...</div>}>
+            <SearchBar basePath="/dashboard/admin/stocks" />
+          </Suspense>
+        </div>
       </div>
 
       <div className="space-y-4 mt-6">
-        {isFetching ? (
-          Array.from({ length: 10 }).map((_, index) => <SkeletonRow key={index} />)
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, index) => <StockItemSkeleton key={index} />)
         ) : (data?.content ?? []).length > 0 ? (
           (data?.content ?? []).map((stock: Stock) => (
             <StockItem 
               key={stock.stockId}
               stock={stock}
-              // onEdit={() => {
-              //   setEditingStock(stock);
-              //   setIsModalOpen(true);
-              // }}
+              onEdit={() => {
+                setEditingStock(stock);
+                setIsModalOpen(true);
+              }}
             />
           ))
         ) : (
-          !isFetching && (
+          !isLoading && (
             <div className="text-center text-gray-500 mt-4">
-              {searchQuery ? `No categories found for "${searchQuery}"` : "No categories available"}
+              {searchQuery ? `No stocks found for "${searchQuery}"` : "No stocks available"}
             </div>
           )
         )}
@@ -90,15 +113,25 @@ const StockTable = () => {
       <Pagination
         currentPage={currentPage}
         totalPages={data?.totalPages ?? 1}
-        onPageChange={updatePage} 
+        onPageChange={(page) => {
+          router.push(`/dashboard/admin/stocks?page=${page}&search=${searchQuery}&warehouse=${selectedWarehouse}`);
+        }}
         basePath={"/dashboard/admin/stocks"}
       />
 
-      {/* <StockModal 
+      <AdjustStockModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         stock={editingStock}
-      /> */}
+        warehouseId={selectedWarehouse ?? editingStock?.warehouseId ?? null}
+        onRefresh={refreshStocks}
+      />
+
+      <CreateStockModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)}
+        onRefresh={refreshStocks}
+      />
     </div>
   );
 };

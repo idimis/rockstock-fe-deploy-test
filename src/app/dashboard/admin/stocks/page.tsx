@@ -10,7 +10,7 @@ import StockTable from "@/components/dashboardAdmin/stock/StockTable";
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const AdminCategory = () => {
+const AdminStock = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -35,9 +35,9 @@ const AdminCategory = () => {
         {/* Sidebar */}
         <Sidebar />
         
-        <main className="flex-grow p-6 shadow-md">       
-          {/* CategoryTable */}
-          <Suspense fallback={<div>Loading Product Cust...</div>}>
+        <main className="flex-grow p-6 shadow-md overflow-hidden">
+          {/* Stock Table */}
+          <Suspense fallback={<div>Loading Stocks Management...</div>}>
             <StockTable />
           </Suspense>
         </main>
@@ -49,4 +49,4 @@ const AdminCategory = () => {
   );
 };
 
-export default AdminCategory;
+export default AdminStock;

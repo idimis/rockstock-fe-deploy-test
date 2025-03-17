@@ -10,7 +10,7 @@ import ProductTable from "@/components/dashboardAdmin/product/ProductTable";
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const AdminCategory = () => {
+const AdminProduct = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -36,8 +36,8 @@ const AdminCategory = () => {
         <Sidebar />
         
         <main className="flex-grow p-6 shadow-md">       
-          {/* CategoryTable */}
-          <Suspense fallback={<div>Loading Product Cust...</div>}>
+          {/* ProductTable */}
+          <Suspense fallback={<div>Loading Products Management...</div>}>
             <ProductTable />
           </Suspense>
         </main>
@@ -49,4 +49,4 @@ const AdminCategory = () => {
   );
 };
 
-export default AdminCategory;
+export default AdminProduct;
