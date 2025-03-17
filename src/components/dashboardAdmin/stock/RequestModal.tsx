@@ -111,7 +111,7 @@ const RequestStockModal: React.FC<RequestStockModalProps> = ({ isOpen, onClose, 
               <div className="mt-4">
                 <label className="block text-gray-600 mb-2">Origin Warehouse</label>
                 <Field name="originWarehouse">
-                  {({ field, form }: FieldProps) => (
+                  {({ field }: FieldProps) => (
                     <Select
                       {...field}
                       options={warehouses

@@ -4,6 +4,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/utils/axiosInstance";
 import { toast } from "react-toastify";
 import debounce from "lodash.debounce";
+import { Product } from "@/types/product";
+import { Warehouse } from "@/types/warehouse";
+import axios from "axios";
 
 interface CreateStockModalProps {
   isOpen: boolean;
@@ -17,15 +20,13 @@ interface SelectOption {
 }
 
 const CreateStockModal: React.FC<CreateStockModalProps> = ({ isOpen, onClose, onRefresh }) => {
-  if (!isOpen) return null;
-
   const [selectedProduct, setSelectedProduct] = useState<SelectOption | null>(null);
   const [selectedWarehouse, setSelectedWarehouse] = useState<SelectOption | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const debouncedSearch = useCallback(
     debounce((searchValue: string) => setSearchTerm(searchValue), 750),
-    []
+    [setSearchTerm]
   );
 
   const { data: products, isLoading: isLoadingProducts, error: productError } = useQuery({
@@ -34,7 +35,7 @@ const CreateStockModal: React.FC<CreateStockModalProps> = ({ isOpen, onClose, on
       const response = await axiosInstance.get("/products/active", {
         params: { name: searchTerm },
       });
-      return response.data.content.map((product: any) => ({
+      return response.data.content.map((product: Product) => ({
         value: product.productId,
         label: product.productName,
       }));
@@ -46,7 +47,7 @@ const CreateStockModal: React.FC<CreateStockModalProps> = ({ isOpen, onClose, on
     queryKey: ["warehouses"],
     queryFn: async (): Promise<SelectOption[]> => {
       const response = await axiosInstance.get("/warehouses");
-      return response.data.map((warehouse: any) => ({
+      return response.data.map((warehouse: Warehouse) => ({
         value: warehouse.id,
         label: warehouse.name,
       }));
@@ -73,16 +74,22 @@ const CreateStockModal: React.FC<CreateStockModalProps> = ({ isOpen, onClose, on
       onClose();
       onRefresh();
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error("Stock creation failed:", error);
-
-      if (error.response && error.response.status === 409) {
-        toast.error(error.response.data.message || "Failed to create stock");
+  
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          toast.error(error.response.data.message || "Failed to create stock");
+        } else {
+          toast.error("Failed to create stock");
+        }
       } else {
-        toast.error("Failed to create stock");
+        toast.error("An unexpected error occurred");
       }
     },
   });
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -95,9 +102,7 @@ const CreateStockModal: React.FC<CreateStockModalProps> = ({ isOpen, onClose, on
             options={products || []}
             value={selectedProduct}
             onChange={setSelectedProduct}
-            placeholder={
-              isLoadingProducts ? "Loading products..." : "Select a product..."
-            }
+            placeholder={isLoadingProducts ? "Loading products..." : "Select a product..."}
             isLoading={isLoadingProducts}
             isSearchable
             isDisabled={isLoadingProducts || !!productError}
@@ -118,9 +123,7 @@ const CreateStockModal: React.FC<CreateStockModalProps> = ({ isOpen, onClose, on
             options={warehouses || []}
             value={selectedWarehouse}
             onChange={setSelectedWarehouse}
-            placeholder={
-              isLoadingWarehouses ? "Loading warehouses..." : "Select a warehouse..."
-            }
+            placeholder={isLoadingWarehouses ? "Loading warehouses..." : "Select a warehouse..."}
             isLoading={isLoadingWarehouses}
             isSearchable
             isDisabled={isLoadingWarehouses || !!warehouseError}

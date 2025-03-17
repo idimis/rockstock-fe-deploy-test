@@ -16,8 +16,6 @@ interface StockModalProps {
 }
 
 const AdjustStockModal: React.FC<StockModalProps> = ({ isOpen, onClose, stock, warehouseId, onRefresh }) => {
-  if (!isOpen) return null;
-
   const validationSchema = Yup.object().shape({
     newStockQuantity: Yup.number()
       .required("New stock quantity is required")
@@ -31,11 +29,10 @@ const AdjustStockModal: React.FC<StockModalProps> = ({ isOpen, onClose, stock, w
 
   const mutation = useMutation({
     mutationFn: async (values: { newStockQuantity: number; description: string }) => {
-      
       if (!stock || !warehouseId) {
         throw new Error("Missing stock or warehouse data");
       }
-  
+
       return axiosInstance.post(`/mutations/${warehouseId}/${stock.productId}/adjust`, {
         newStockQuantity: values.newStockQuantity,
         description: values.description,
@@ -51,6 +48,9 @@ const AdjustStockModal: React.FC<StockModalProps> = ({ isOpen, onClose, stock, w
     },
   });
 
+  // Move this condition AFTER hooks are called
+  if (!isOpen) return null;
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -63,6 +63,12 @@ const AdjustStockModal: React.FC<StockModalProps> = ({ isOpen, onClose, stock, w
           }}
           validationSchema={validationSchema}
           onSubmit={(values, { setSubmitting }) => {
+            if (!stock || !warehouseId) {
+              toast.error("Missing stock or warehouse data");
+              setSubmitting(false);
+              return;
+            }
+
             mutation.mutate(values);
             setSubmitting(false);
           }}
