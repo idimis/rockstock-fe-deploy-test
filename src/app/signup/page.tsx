@@ -7,7 +7,6 @@ import Image from "next/image";
 import GoogleIcon from "@/public/icons/google.png";
 import darkImage from "@/public/darkacadem.jpg";
 import Link from "next/link";
-import FacebookIcon from "@/public/icons/facebook.jpg";
 import { signIn } from "next-auth/react";
 
 const SignupContent: React.FC = () => {
@@ -97,11 +96,6 @@ const SignupContent: React.FC = () => {
           <button className="flex items-center bg-white text-gray-600 border border-gray-300 rounded-full py-2 px-4 hover:bg-gray-100 transition duration-300 w-full max-w-xs mb-4" onClick={() => signIn("google")} aria-label="Sign up with Google">
             <Image src={GoogleIcon} alt="Google Icon" width={20} height={20} className="mr-2" />
             Sign up with Google
-          </button>
-
-          <button className="flex items-center bg-white text-gray-600 border border-gray-300 rounded-full py-2 px-4 hover:bg-gray-100 transition duration-300 w-full max-w-xs mb-4" onClick={() => signIn("facebook")} aria-label="Sign up with Google">
-            <Image src={FacebookIcon} alt="Facebook Icon" width={20} height={20} className="mr-2" />
-            Sign up with Facebook
           </button>
 
           <p className="mt-4 text-gray-600 text-center">Already have an account? <Link href="/login" className="text-purple-600 underline">Log in</Link></p>
