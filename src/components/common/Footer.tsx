@@ -26,7 +26,7 @@ const Footer: React.FC = () => {
   const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 
   return (
-    <footer className="bg-gray-600 text-white py-10">
+    <footer className="bg-gray-400 text-white py-10">
       <div className="max-w-screen-xl mx-auto px-6">
 
         {/* Logo & Kolom Footer */}

@@ -81,7 +81,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
           See Order Detail
         </button>
 
-        {decoded?.roles === "Super Admin" && order.status === "PAYMENT_VERIFICATION" && (
+        {decoded?.roles?.[0] === "Super Admin" && order.status === "PAYMENT_VERIFICATION" && (
           <div className="flex gap-2 items-center">
             <button
               className="px-4 py-1 bg-blue-600 text-sm font-semibold text-white rounded-lg hover:bg-blue-500"
@@ -103,7 +103,7 @@ const AdminOrderCard: React.FC<AdminOrderCardProps> = ({
             </button>
           </div>
         )}
-        {decoded?.roles === "Super Admin" && order.status === "PROCESSING" && (
+        {decoded?.roles?.[0]=== "Super Admin" && order.status === "PROCESSING" && (
           <div className="flex gap-2 items-center">
             <button
               className="px-4 py-1 bg-red-600 text-sm font-semibold text-white rounded-lg hover:bg-red-500"

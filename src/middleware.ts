@@ -14,7 +14,7 @@ export function middleware(req: NextRequest) {
   }
 
   try {
-    const userRole = decoded?.roles ?? "";
+    const userRole = decoded?.roles?.[0] ?? "";
 
     const routePermissions: { [key: string]: string[] } = {
       "/dashboard/admin": ["Super Admin", "Warehouse Admin"],

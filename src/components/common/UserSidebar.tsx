@@ -21,7 +21,7 @@ const UserSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 
   return (
     <aside
-      className={`bg-white shadow-md w-64 p-4 fixed lg:static top-25 left-0 h-full transition-transform transform ${
+      className={`bg-white shadow-md w-64 p-4 fixed lg:static top-0 left-0 h-full z-50 transition-transform transform ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } lg:translate-x-0 lg:block`}
     >

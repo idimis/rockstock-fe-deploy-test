@@ -48,17 +48,17 @@ const SalesReport = () => {
   const decoded = accessToken ? decodeToken(accessToken) : null;
 
   useEffect(() => {
-    if (decoded?.roles === "Super Admin") {
+    if (decoded?.roles?.[0] === "Super Admin") {
       fetchWarehouses()
       .then(({ warehouses }) => setWarehouses(warehouses))
       .catch(() => console.error("Failed to fetch warehouses"));
     }
-    if (decoded?.roles === "Warehouse Admin") {
+    if (decoded?.roles?.[0] === "Warehouse Admin") {
       fetchWHAdminWarehouses()
       .then(({ warehouses }) => setWarehouses(warehouses))
       .catch(() => console.error("Failed to fetch warehouses"));
     }
-  }, [decoded?.roles]);
+  }, [decoded?.roles?.[0]]);
 
   // const fetchWarehouses = async () => {
   //   try {

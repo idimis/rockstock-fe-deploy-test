@@ -94,7 +94,7 @@ const Navbar: React.FC<NavbarProps> = () => {
   };
 
   return (
-    <header className="bg-white sticky top-0 z-50 border-b border-b-red-600">
+    <header className="bg-white sticky top-0 z-50 border-b border-b-gray-500">
       <div className="container mx-auto px-4 py-6 flex flex-col gap-4 justify-between items-center md:flex-row">
         {/* Logo */}
         <div>

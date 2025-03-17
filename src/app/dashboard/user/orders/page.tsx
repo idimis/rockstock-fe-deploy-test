@@ -42,7 +42,7 @@ const OrdersPage = () => {
       return;
     }
     
-    if (!decoded || decoded?.roles !== "Customer") {
+    if (!decoded || decoded?.roles?.[0] !== "Customer") {
       router.replace(decoded ? "/unauthorized" : "/login");
     }
   }, [router, accessToken, decoded]);
