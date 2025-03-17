@@ -41,7 +41,7 @@ const OrdersPage = () => {
       router.replace("/login");
       return;
     }
-    if (!decoded || decoded?.roles === "Customer") {
+    if (!decoded || decoded?.roles?.[0] === "Customer") {
       router.replace(decoded ? "/unauthorized" : "/login");
     }
   }, [router, accessToken, decoded]);
@@ -54,17 +54,17 @@ const OrdersPage = () => {
   }, [filters, page, size]);
   
   useEffect(() => {
-    if (decoded?.roles === "Super Admin") {
+    if (decoded?.roles?.[0] === "Super Admin") {
       fetchWarehouses()
       .then(({ warehouses }) => setWarehouses(warehouses))
       .catch(() => console.error("Failed to fetch warehouses"));
     }
-    if (decoded?.roles === "Warehouse Admin") {
+    if (decoded?.roles?.[0] === "Warehouse Admin") {
       fetchWHAdminWarehouses()
       .then(({ warehouses }) => setWarehouses(warehouses))
       .catch(() => console.error("Failed to fetch warehouses"));
     }
-  }, [decoded?.roles]);
+  }, [decoded?.roles?.[0]]);
 
   const handleOpenOrderDetail = async (order: Order) => {
     setSelectedOrder(order);

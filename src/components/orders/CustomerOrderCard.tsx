@@ -6,15 +6,24 @@ import { formatCurrency, formatStatus } from "@/lib/utils/format";
 import { statusColors } from "@/constants/statusColors";
 import { useState } from "react";
 
-const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onLoadingOrderItems, onOpenDetail, onGatewayPayment, onUploadPaymentProof, onComplete, onCancel }) => {
+const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onLoadingOrderItems, onOpenDetail, onGatewayPayment, onUploadPaymentProof, onCancel, onComplete }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [loadingCancel, setLoadingCancel] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [loadingComplete, setLoadingComplete] = useState(false);
 
   const handleCancel = async () => {
     setLoadingCancel(true);
     await onCancel(order);
     setLoadingCancel(false);
     setShowCancelModal(false);
+  };
+
+  const handleComplete = async () => {
+    setLoadingComplete(true);
+    await onComplete(order);
+    setLoadingComplete(false);
+    setShowCompleteModal(false);
   };
   
   return (
@@ -108,7 +117,7 @@ const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onLoadingO
         {order.status === "ON_DELIVERY" && (
           <button
             className="px-4 py-1 bg-green-600 text-sm font-semibold text-white rounded-lg hover:bg-green-500"
-            onClick={() => onComplete(order)}
+            onClick={() => setShowCompleteModal(true)}
           >
             Complete Order
           </button>
@@ -141,7 +150,33 @@ const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onLoadingO
           </div>
         </div>
       )}
-      
+      {showCompleteModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold text-gray-900">Cancel Order</h2>
+            <p className="text-sm text-gray-600 mt-2">Are you sure you want to complete this order?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="px-4 py-1 text-sm font-semibold text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300"
+                onClick={() => setShowCancelModal(false)}
+              >
+                No
+              </button>
+              <button
+                className="px-4 py-1 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-500 flex items-center justify-center"
+                onClick={handleComplete}
+                disabled={loadingComplete}
+              >
+                {loadingComplete ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  "Yes, Complete Order"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

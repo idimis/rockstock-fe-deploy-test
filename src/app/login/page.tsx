@@ -81,7 +81,7 @@ const LoginContent: React.FC = () => {
   
         localStorage.setItem("userId", decodedToken.userId.toString());
   
-        if (decodedToken.roles === "Customer") {
+        if (decodedToken?.roles?.[0] === "Customer") {
           router.push("/dashboard/user");
         } else {
           router.push("/dashboard/admin");

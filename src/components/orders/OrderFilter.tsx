@@ -95,7 +95,7 @@ const OrderFilter: React.FC<OrderFilterProps> = ({ filters, setFilters, setPage,
     <div className="flex flex-col gap-2 p-4 border border-gray-300 rounded-lg bg-white shadow">
       <div className="flex flex-col items-center gap-2 md:flex-row">
         {/* Warehouse Filter */}
-        {decode?.roles !== "Customer" && (
+        {decode?.roles?.[0] !== "Customer" && (
           <select
             onChange={(e) => handleFilterChange("warehouseId", e.target.value === "ALL_WAREHOUSES" ? null : e.target.value)}
             value={filters.warehouseId || "ALL_WAREHOUSES"}
