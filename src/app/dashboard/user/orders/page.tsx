@@ -83,7 +83,7 @@ const OrdersPage = () => {
 
   const handleCompleteOrder = async (order: Order) => {
     try {
-      await updateOrderStatus("COMPLETE", {}, order.orderId);
+      await updateOrderStatus("COMPLETED", {}, order.orderId);
       console.log("Order completed successfully");
       fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
     } catch {
