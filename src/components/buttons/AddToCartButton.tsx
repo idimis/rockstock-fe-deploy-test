@@ -14,7 +14,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }
 
   const handleAddToCart = async () => {
     if (!accessToken) {
-      toast.error("Please log in to add items to the cart.");
+      toast.error("Please login first to add items to the cart.");
       return;
     }
 
@@ -44,7 +44,6 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }
     <>
       <button
         onClick={handleAddToCart}
-        disabled={loading || !accessToken}
         className={`mt-3 px-4 py-2 w-full rounded-md transition ${
           loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-500 hover:bg-red-600 active:bg-red-700 text-white"
         }`}
@@ -52,8 +51,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, quantity }
         {loading ? "Adding..." : "Add to Cart"}
       </button>
 
-      {/* Toast Container for notifications */}
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar closeOnClick pauseOnHover />
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar closeOnClick pauseOnHover />
     </>
   );
 };

@@ -1,9 +1,5 @@
 "use client";
 
-import Sidebar from "@/components/common/AdminSidebar";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
 import { useState } from "react";
 
 const stockData = [
@@ -31,58 +27,50 @@ const AdminStock = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-100 text-black">
-      <Header />
-      <Navbar />
-      <div className="flex flex-grow">
-        <Sidebar />
-        <main className="flex-grow p-6 bg-white shadow-md">
-          <h1 className="text-2xl font-bold mb-4">📦 Stock Management</h1>
-          <table className="w-full border border-gray-300">
-            <thead>
-              <tr className="bg-gray-200">
-                <th className="border p-2">Stock ID</th>
-                <th className="border p-2">Product Name</th>
-                <th className="border p-2">Stock Quantity</th>
-                <th className="border p-2">Status</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stocks.map((product) => (
-                <tr key={product.id}>
-                  <td className="border p-2">{product.id}</td>
-                  <td className="border p-2">{product.name}</td>
-                  <td className="border p-2">{product.quantity} units</td>
-                  <td
-                    className={`border p-2 font-semibold ${
-                      product.quantity > 10
-                        ? "text-green-600"
-                        : product.quantity > 3
-                        ? "text-yellow-600"
-                        : "text-red-600"
-                    }`}
+    <main className="flex-grow p-6 bg-white shadow-md">
+      <h1 className="text-2xl font-bold mb-4">📦 Stock Management</h1>
+      <table className="w-full border border-gray-300">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="border p-2">Stock ID</th>
+            <th className="border p-2">Product Name</th>
+            <th className="border p-2">Stock Quantity</th>
+            <th className="border p-2">Status</th>
+            <th className="border p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stocks.map((product) => (
+            <tr key={product.id}>
+              <td className="border p-2">{product.id}</td>
+              <td className="border p-2">{product.name}</td>
+              <td className="border p-2">{product.quantity} units</td>
+              <td
+                className={`border p-2 font-semibold ${
+                  product.quantity > 10
+                    ? "text-green-600"
+                    : product.quantity > 3
+                    ? "text-yellow-600"
+                    : "text-red-600"
+                }`}
+              >
+                {getStatus(product.quantity)}
+              </td>
+              <td className="border p-2">
+                {product.quantity <= 10 && (
+                  <button
+                    className="bg-blue-500 text-white px-3 py-1 rounded"
+                    onClick={() => restockProduct(product.id)}
                   >
-                    {getStatus(product.quantity)}
-                  </td>
-                  <td className="border p-2">
-                    {product.quantity <= 10 && (
-                      <button
-                        className="bg-blue-500 text-white px-3 py-1 rounded"
-                        onClick={() => restockProduct(product.id)}
-                      >
-                        Restock
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </main>
-      </div>
-      <Footer />
-    </div>
+                    Restock
+                  </button>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </main>
   );
 };
 

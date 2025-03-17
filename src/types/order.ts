@@ -17,6 +17,7 @@ export interface Order {
   orderId: number;
   orderCode: string;
   paymentProof: string | null;
+  paymentRedirectUrl: string | null;
   formattedCreatedAt: string;
   status: keyof typeof statusColors;
   totalPrice: number;
@@ -28,7 +29,9 @@ export interface Order {
 
 export interface CustomerOrderCardProps {
   order: Order;
+  onLoadingOrderItems: boolean;
   onOpenDetail: (order: Order) => void;
+  onGatewayPayment: (order: Order) => void;
   onUploadPaymentProof: (order: Order) => void;
   onCancel: (order: Order) => void;
   onComplete: (order: Order) => void;

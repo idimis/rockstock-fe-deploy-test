@@ -107,9 +107,8 @@ const CheckoutPage = () => {
       if (!selectedPayment) return;
 
       if (selectedPayment.name === "Manual Bank Transfer") {
-        router.push(`/checkout/payment/manual/${orderId}`);
+        router.replace(`/checkout/payment/manual/${orderId}`);
       } else {
-        setShowPopup(false);
         setSnapToken(transactionToken);
       }
     } catch (error) {
@@ -117,15 +116,23 @@ const CheckoutPage = () => {
       toast.error("Failed to place order. Please try again.");
     } finally {
       setLoading(false);
+      setShowPopup(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       <SimpleNavbar />
       <main className="flex-1 container mx-auto p-6 mt-8 mb-8">
-        <h1 className="text-3xl font-bold mb-4 text-black">Checkout</h1>
-        {loading && <p>Loading cart items...</p>}
+        <h1 className="text-3xl font-bold mb-4 text-red-600">Checkout</h1>
+        {loading && 
+          <div className="flex justify-center items-center py-6">
+            <div className="flex flex-col items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+              <p className="mt-2 text-gray-800 font-semibold">Getting Cart Items...</p>
+            </div>
+          </div>
+        }
         {!loading && cartItems.length === 0 && <p>Your cart is empty.</p>}
         {!loading && cartItems.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -135,12 +142,14 @@ const CheckoutPage = () => {
                 addressPostalCode={addressPostalCode} setAddressPostalCode={setAddressPostalCode}
                 nearestWarehouse={nearestWarehouse} setNearestWarehouse={setNearestWarehouse} 
               />
-              <DeliveryServiceComponent
-                origin={nearestWarehouse?.subDistrictPostalCode ?? null}
-                destination={addressPostalCode ?? null}
-                weight={totalWeight || 0}
-                setShippingFee={setShippingFee}
-              />
+              {addressPostalCode !== null && (
+                  <DeliveryServiceComponent
+                    origin={nearestWarehouse?.subDistrictPostalCode ?? null}
+                    destination={addressPostalCode ?? null}
+                    weight={totalWeight || 0}
+                    setShippingFee={setShippingFee}
+                  />
+              )}
               <OrderSummary cartItems={cartItems} />
             </div>
             <DetailPayment
@@ -159,30 +168,41 @@ const CheckoutPage = () => {
       <Footer />
 
       {showPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-            <h2 className="text-xl font-semibold text-black mb-4">Confirm Payment</h2>
-            <p className="text-gray-700 mb-4">
-              Once you proceed, you <b>cannot change</b>, add, or remove items, and you also
-              <b> cannot change the address</b> or payment method. Are you sure you want to continue?
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-400"
-                onClick={() => setShowPopup(false)}
-              >
-                Cancel
-              </button>
-              <button
-                className={`px-4 py-2 text-white font-bold rounded-lg w-full transition ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-500"
-                }`}
-                onClick={handleConfirmPayment}
-                disabled={loading}
-              >
-                {loading ? "Processing..." : "Confirm & Pay"}
-              </button>
-            </div>
+            {loading ? (
+              <div className="flex justify-center items-center py-6">
+                <div className="flex flex-col items-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+                  <p className="mt-2 text-gray-800 font-semibold">Please Wait...</p>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <h2 className="text-xl font-semibold text-black mb-4">Confirm Payment</h2>
+                <p className="text-gray-700 mb-4">
+                  Once you proceed, you <b>cannot change</b>, add, or remove items, and you also
+                  <b> cannot change the address</b> or payment method. Are you sure you want to continue?
+                </p>
+                <div className="flex justify-end gap-4">
+                  <button
+                    className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-400"
+                    onClick={() => setShowPopup(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className={`px-4 py-2 text-white font-bold rounded-lg w-full transition ${
+                      loading ? "bg-gray-400 cursor-not-allowed" : "bg-red-600 hover:bg-red-500"
+                    }`}
+                    onClick={handleConfirmPayment}
+                    disabled={loading}
+                  >
+                    {loading ? "Processing..." : "Confirm & Pay"}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -23,25 +23,23 @@ const DetailPayment: React.FC<DetailPaymentProps> = ({
       try {
         setLoading(true);
         const paymentMethodData = await fetchPaymentMethods();
-        if (paymentMethodData) {
-          setPaymentMethods(paymentMethodData);
-        }
-        console.log("Payment Methods: ", paymentMethods);
+        setPaymentMethods(paymentMethodData ?? []);
         
       } catch (error) {
         console.error("Error placing order:", error);
         toast.error("Failed to place order. Please try again.");
+        setPaymentMethods([]);
       } finally {
         setLoading(false);
       }
     };
 
     getPaymentMethods();
-  }, [paymentMethods, setPaymentMethods]);
+  }, [setPaymentMethods]);
 
   const handlePayNow = () => {
     if (!selectedMethod) {
-      alert("Please select a payment method before proceeding!");
+      toast.error("Please select a payment method before proceeding!");
       return;
     }
     onShowPopup();

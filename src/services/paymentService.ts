@@ -16,12 +16,12 @@ export const fetchPaymentMethods = async () => {
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
 
-      return response.data.data;
+      return response.data?.data;
     } catch (err: unknown) {
       const errorMessage = (err as unknown as { 
           response?: { data?: { message?: string } } 
       }).response?.data?.message || (err as Error).message;
       console.log("Unknown Error Fetcing Payment Methods!", errorMessage);
-
+      return [];
     } 
 };

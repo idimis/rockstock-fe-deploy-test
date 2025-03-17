@@ -143,8 +143,6 @@ const AdminPage = () => {
   
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-50 text-gray-900">
-      <div className="flex flex-grow">
         <div className="flex-grow p-6 bg-white shadow-xl rounded-lg">
           <h1 className="text-3xl font-bold mb-6">👤 Manage Admin</h1>
           {error && <div className="text-red-500 mb-4">{error}</div>}
@@ -203,8 +201,6 @@ const AdminPage = () => {
       <UserList />
         </div>
       </div>
-      </div>
-    </div>
   );
 };
 

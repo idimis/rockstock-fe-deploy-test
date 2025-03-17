@@ -276,169 +276,164 @@ const AddressPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-gray-100 text-black">
-      <div className="flex flex-grow">
-        <main className="flex-grow p-6 bg-white shadow-md">
-          <h1 className="text-2xl font-bold mb-4">📍 My Addresses</h1>
-          <div className="p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
-            {error && <p className="text-red-500">{error}</p>}
-            <input
-              type="text"
-              className="border p-2 w-full mb-2"
-              placeholder="Label"
-              onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })}
+    <main className="flex-grow p-6 bg-white shadow-md">
+      <h1 className="text-2xl font-bold mb-4">📍 My Addresses</h1>
+      <div className="p-6 bg-white shadow-md rounded-lg">
+        <h2 className="text-xl font-semibold mb-4">Add New Address</h2>
+        {error && <p className="text-red-500">{error}</p>}
+        <input
+          type="text"
+          className="border p-2 w-full mb-2"
+          placeholder="Label"
+          onChange={(e) => setNewAddress({ ...newAddress, label: e.target.value })}
+        />
+        <input
+          type="text"
+          className="border p-2 w-full mb-2"
+          placeholder="Address Detail"
+          onChange={(e) => setNewAddress({ ...newAddress, addressDetail: e.target.value })}
+        />
+        <div>
+          {/* Province Select */}
+          <label className="block mb-2 text-sm font-medium text-gray-700">Select Province:</label>
+          <Select
+            options={provinceOptions}
+            value={selectedProvince ? { value: selectedProvince.id, label: selectedProvince.name } : null}
+            onChange={(selectedOption) => {
+              if (selectedOption) {
+                const province = provinces.find((p) => p.id === selectedOption.value) || null;
+                setSelectedProvince(province);
+                setSelectedCity(null);
+                setCities([]);
+              }
+            }}
+            placeholder="Search and select a province..."
+            isSearchable
+            className="mt-2"
+          />
+
+          {/* City Select */}
+          <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select City:</label>
+          <Select
+            options={cityOptions}
+            value={selectedCity ? { value: selectedCity.id, label: selectedCity.name } : null}
+            onChange={(selectedOption) => {
+              if (selectedOption) {
+                const city = cities.find((c) => c.id === selectedOption.value) || null;
+                setSelectedCity(city);
+                setSelectedDistrict(null);
+                setDistricts([]);
+              }
+            }}
+            placeholder="Search and select a city..."
+            isSearchable
+            className="mt-2"
+            isDisabled={!selectedProvince}
+          />
+
+          {/* District Select */}
+          <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select District:</label>
+          <Select
+            options={districtOptions}
+            value={selectedDistrict ? { value: selectedDistrict.id, label: selectedDistrict.name } : null}
+            onChange={(selectedOption) => {
+              if (selectedOption) {
+                const district = districts.find((d) => d.id === selectedOption.value) || null;
+                setSelectedDistrict(district);
+                setSelectedSubDistrict(null);
+                setSubDistricts([]);
+              }
+            }}
+            placeholder="Search and select a district..."
+            isSearchable
+            className="mt-2"
+            isDisabled={!selectedCity}
+          />
+
+          {/* Sub District Select */}
+          <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select Sub District:</label>
+          <Select
+            options={subDistrictOptions}
+            value={selectedSubDistrict ? { value: selectedSubDistrict.id, label: selectedSubDistrict.name } : null}
+            onChange={(selectedOption) => {
+              if (selectedOption) {
+                const subDistrictId = selectedOption.value
+                setNewAddress({ ...newAddress, subDistrictId})
+                const subDistrict = subDistricts.find((s) => s.id === selectedOption.value) || null;
+                setSelectedSubDistrict(subDistrict);
+              }
+            }}
+            placeholder="Search and select a sub-district..."
+            isSearchable
+            className="mt-2"
+            isDisabled={!selectedDistrict}
+          />
+        </div>
+        <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={addNewAddress}>
+          Save
+        </button>
+      </div>
+    {error && <div className="text-red-500 mb-4">{error}</div>}
+
+      <div className="p-4 bg-gray-50 shadow-md rounded-xl border border-gray-200">
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          <ul>
+            <Map 
+              latitude={userLocation?.lat || 0} 
+              longitude={userLocation?.lng || 0} 
+              setCoordinates={handleMapClick} 
             />
-            <input
-              type="text"
-              className="border p-2 w-full mb-2"
-              placeholder="Address Detail"
-              onChange={(e) => setNewAddress({ ...newAddress, addressDetail: e.target.value })}
-            />
-            <div>
-              {/* Province Select */}
-              <label className="block mb-2 text-sm font-medium text-gray-700">Select Province:</label>
-              <Select
-                options={provinceOptions}
-                value={selectedProvince ? { value: selectedProvince.id, label: selectedProvince.name } : null}
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    const province = provinces.find((p) => p.id === selectedOption.value) || null;
-                    setSelectedProvince(province);
-                    setSelectedCity(null);
-                    setCities([]);
-                  }
-                }}
-                placeholder="Search and select a province..."
-                isSearchable
-                className="mt-2"
-              />
 
-              {/* City Select */}
-              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select City:</label>
-              <Select
-                options={cityOptions}
-                value={selectedCity ? { value: selectedCity.id, label: selectedCity.name } : null}
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    const city = cities.find((c) => c.id === selectedOption.value) || null;
-                    setSelectedCity(city);
-                    setSelectedDistrict(null);
-                    setDistricts([]);
-                  }
-                }}
-                placeholder="Search and select a city..."
-                isSearchable
-                className="mt-2"
-                isDisabled={!selectedProvince}
-              />
-
-              {/* District Select */}
-              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select District:</label>
-              <Select
-                options={districtOptions}
-                value={selectedDistrict ? { value: selectedDistrict.id, label: selectedDistrict.name } : null}
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    const district = districts.find((d) => d.id === selectedOption.value) || null;
-                    setSelectedDistrict(district);
-                    setSelectedSubDistrict(null);
-                    setSubDistricts([]);
-                  }
-                }}
-                placeholder="Search and select a district..."
-                isSearchable
-                className="mt-2"
-                isDisabled={!selectedCity}
-              />
-
-              {/* Sub District Select */}
-              <label className="block mt-4 mb-2 text-sm font-medium text-gray-700">Select Sub District:</label>
-              <Select
-                options={subDistrictOptions}
-                value={selectedSubDistrict ? { value: selectedSubDistrict.id, label: selectedSubDistrict.name } : null}
-                onChange={(selectedOption) => {
-                  if (selectedOption) {
-                    const subDistrictId = selectedOption.value
-                    setNewAddress({ ...newAddress, subDistrictId})
-                    const subDistrict = subDistricts.find((s) => s.id === selectedOption.value) || null;
-                    setSelectedSubDistrict(subDistrict);
-                  }
-                }}
-                placeholder="Search and select a sub-district..."
-                isSearchable
-                className="mt-2"
-                isDisabled={!selectedDistrict}
-              />
-            </div>
-            <button className="bg-green-500 text-white px-4 py-2 rounded" onClick={addNewAddress}>
-              Save
-            </button>
-          </div>
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-
-          <div className="p-4 bg-gray-50 shadow-md rounded-xl border border-gray-200">
-            {loading ? (
-              <p>Loading...</p>
-            ) : (
-              <ul>
-                <Map 
-                  latitude={userLocation?.lat || 0} 
-                  longitude={userLocation?.lng || 0} 
-                  setCoordinates={handleMapClick} 
-                />
-
-                {addresses.length > 0 ? (
-                  addresses.map((address) => (
-                    <li
-                      key={address.addressId}
-                      className={`mt-2 p-4 rounded-xl border shadow-sm hover:shadow-md transition ${
-                        address.isMain ? "bg-yellow-50 border-yellow-400" : "bg-white border-gray-300"
-                      }`}
+            {addresses.length > 0 ? (
+              addresses.map((address) => (
+                <li
+                  key={address.addressId}
+                  className={`mt-2 p-4 rounded-xl border shadow-sm hover:shadow-md transition ${
+                    address.isMain ? "bg-yellow-50 border-yellow-400" : "bg-white border-gray-300"
+                  }`}
+                >
+                  <div>
+                    <h3 className="font-semibold text-lg text-gray-900">{address.label}</h3>
+                    <p className="text-gray-700 text-md">{address.addressDetail}</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      {address.isMain ? "✅ Main Address" : "Secondary Address"}
+                    </p>
+                  </div>
+                  <div className="mt-3 flex gap-3">
+                    {!address.isMain && (
+                      <button
+                        className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition hover:scale-105"
+                        onClick={() => setMainAddress(address.addressId)}
+                      >
+                        Set as Main
+                      </button>
+                    )}
+                    <button
+                      className="px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition hover:scale-105"
+                      onClick={() => {
+                        setSelectedAddress(address);
+                        setEditModalOpen(true);
+                      }}
                     >
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900">{address.label}</h3>
-                        <p className="text-gray-700 text-md">{address.addressDetail}</p>
-                        <p className="text-sm font-medium text-gray-600">
-                          {address.isMain ? "✅ Main Address" : "Secondary Address"}
-                        </p>
-                      </div>
-                      <div className="mt-3 flex gap-3">
-                        {!address.isMain && (
-                          <button
-                            className="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition hover:scale-105"
-                            onClick={() => setMainAddress(address.addressId)}
-                          >
-                            Set as Main
-                          </button>
-                        )}
-                        <button
-                          className="px-5 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition hover:scale-105"
-                          onClick={() => {
-                            setSelectedAddress(address);
-                            setEditModalOpen(true);
-                          }}
-                        >
-                          Edit
-                        </button>
-                        <button
-                          className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition hover:scale-105"
-                          onClick={() => deleteAddress(address.addressId)}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </li>
-                  ))
-                ) : (
-                  <p>No addresses found</p>
-                )}
-              </ul>
+                      Edit
+                    </button>
+                    <button
+                      className="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition hover:scale-105"
+                      onClick={() => deleteAddress(address.addressId)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p>No addresses found</p>
             )}
-          </div>
-        </main>
-    </div>
-  
+          </ul>
+        )}
+      </div>
       {editModalOpen && selectedAddress && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-96">
@@ -480,7 +475,7 @@ const AddressPage = () => {
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 

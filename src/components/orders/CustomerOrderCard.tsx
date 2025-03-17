@@ -4,8 +4,19 @@ import Image from "next/image";
 import { CustomerOrderCardProps } from "@/types/order";
 import { formatCurrency, formatStatus } from "@/lib/utils/format";
 import { statusColors } from "@/constants/statusColors";
+import { useState } from "react";
 
-const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onOpenDetail, onUploadPaymentProof, onComplete, onCancel }) => {
+const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onLoadingOrderItems, onOpenDetail, onGatewayPayment, onUploadPaymentProof, onComplete, onCancel }) => {
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [loadingCancel, setLoadingCancel] = useState(false);
+
+  const handleCancel = async () => {
+    setLoadingCancel(true);
+    await onCancel(order);
+    setLoadingCancel(false);
+    setShowCancelModal(false);
+  };
+  
   return (
     <div key={order.orderId} className="border p-4 my-2 w-full bg-white rounded-lg shadow mx-auto">
       <div>
@@ -60,22 +71,38 @@ const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onOpenDeta
           className="px-2 py-1 bg-white text-sm font-semibold text-red-500"
           onClick={() => onOpenDetail(order)}
         >
-          See Order Detail
+          {onLoadingOrderItems ? (
+            <div className="flex justify-center items-center">
+              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-500"></div>
+            </div>
+          ) : (
+            <p>See Order Detail</p>
+          )}
         </button>
         {order.status === "WAITING_FOR_PAYMENT" && (
           <div className="flex gap-2 items-center">
             <button
               className="px-4 py-1 bg-red-600 text-sm font-semibold text-white rounded-lg hover:bg-red-500"
-              onClick={() => onCancel(order)}
+              onClick={() => setShowCancelModal(true)}
             >
               Cancel Order
             </button>
-            <button
-              className="px-4 py-1 bg-blue-600 text-sm font-semibold text-white rounded-lg hover:bg-blue-500"
-              onClick={() => onUploadPaymentProof(order)}
-            >
-              Upload Payment Proof
-            </button>
+            {order.paymentMethod === "Manual Bank Transfer" && (
+              <button
+                className="px-4 py-1 bg-blue-600 text-sm font-semibold text-white rounded-lg hover:bg-blue-500"
+                onClick={() => onUploadPaymentProof(order)}
+              >
+                Upload Payment Proof
+              </button>
+            )}
+            {order.paymentMethod === "Gateway Payments" && (
+              <button
+                className="px-4 py-1 bg-blue-600 text-sm font-semibold text-white rounded-lg hover:bg-blue-500"
+                onClick={() => onGatewayPayment(order)}
+              >
+                Pay
+              </button>
+            )}
           </div>
         )}
         {order.status === "ON_DELIVERY" && (
@@ -87,6 +114,34 @@ const CustomerOrderCard: React.FC<CustomerOrderCardProps> = ({ order, onOpenDeta
           </button>
         )}
       </div>
+      {showCancelModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-lg font-semibold text-gray-900">Cancel Order</h2>
+            <p className="text-sm text-gray-600 mt-2">Are you sure you want to cancel this order?</p>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                className="px-4 py-1 text-sm font-semibold text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300"
+                onClick={() => setShowCancelModal(false)}
+              >
+                No, Keep Order
+              </button>
+              <button
+                className="px-4 py-1 text-sm font-semibold text-white bg-red-600 rounded-lg hover:bg-red-500 flex items-center justify-center"
+                onClick={handleCancel}
+                disabled={loadingCancel}
+              >
+                {loadingCancel ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                ) : (
+                  "Yes, Cancel Order"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
     </div>
   );
 };

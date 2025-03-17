@@ -10,6 +10,15 @@ export interface Address {
     isMain: boolean;
     addressPostalCode: string;
 }
+
+export interface CreateAddressFormValues {
+  label: string;
+  addressDetail: string;
+  note?: string;
+  subDistrictId: string;
+  latitude: string;
+  longitude: string;
+}
   
 export interface AddressComponentProps {
     addressId: number | null;
@@ -39,4 +48,8 @@ export interface SubDistrict {
     id: number;
     name: string; 
     postalCode: string;
+}
+
+export interface CreateAddressProps {
+  onCloseCreateAddress: () => void;
 }

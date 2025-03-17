@@ -79,7 +79,6 @@ export const updateOrderStatus = async (
   data: object,
   orderId?: number,
   orderCode?: string,
-  attempt = 1
 ): Promise<Order[]> => {
   try {
     const response = await axios.patch(
@@ -101,15 +100,7 @@ export const updateOrderStatus = async (
   } catch (err: unknown) {
     const errorMessage = (err as unknown as { response?: { data?: { message?: string } } }).response?.data?.message || (err as Error).message;
     console.error("Error updating order status:", errorMessage);
-
-    if (errorMessage.includes("JDBC")) {
-      const retryDelay = Math.min(2 ** attempt * 1000, 30000);
-      console.warn(`Retrying updateOrderStatus in ${retryDelay / 1000}s...`);
-      await new Promise((resolve) => setTimeout(resolve, retryDelay));
-      return updateOrderStatus(status, data, orderId, orderCode, attempt + 1);
-    } else {
-      throw new Error("Failed to update order status");
-    }
+    throw new Error("Failed to update order status");
   }
 }
 

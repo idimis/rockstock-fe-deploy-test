@@ -1,10 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Header from "@/components/common/Header";
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
-import AdminSidebarPanel from "@/components/common/AdminSidebar";
 import axios from "axios";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
@@ -244,11 +240,6 @@ const WarehousePage = () => {
 
 
   return (
-      <div className="flex min-h-screen flex-col bg-gray-100 text-black">
-        <Header />
-        <Navbar />
-        <div className="flex flex-grow">
-          <AdminSidebarPanel />
           <main className="flex-grow p-6 bg-white shadow-md">
             <h1 className="text-2xl font-bold mb-4">🏭 Warehouse Management</h1>
   
@@ -416,70 +407,66 @@ const WarehousePage = () => {
       </section>
 
       {isModalOpen && editingWarehouse && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-      <h2 className="text-xl font-bold mb-4">Edit Warehouse</h2>
-      <input
-        type="text"
-        placeholder="Warehouse Name"
-        className="border p-3 w-full rounded-lg mb-2"
-        value={editingWarehouse.name}
-        onChange={(e) =>
-          setEditingWarehouse({ ...editingWarehouse, name: e.target.value })
-        }
-      />
-      <input
-        type="text"
-        placeholder="Address"
-        className="border p-3 w-full rounded-lg mb-2"
-        value={editingWarehouse.address}
-        onChange={(e) =>
-          setEditingWarehouse({ ...editingWarehouse, address: e.target.value })
-        }
-      />
-      <input
-        type="text"
-        placeholder="Longitude"
-        className="border p-3 w-full rounded-lg mb-2"
-        value={editingWarehouse.longitude}
-        onChange={(e) =>
-          setEditingWarehouse({ ...editingWarehouse, longitude: e.target.value })
-        }
-      />
-      <input
-        type="text"
-        placeholder="Latitude"
-        className="border p-3 w-full rounded-lg mb-2"
-        value={editingWarehouse.latitude}
-        onChange={(e) =>
-          setEditingWarehouse({ ...editingWarehouse, latitude: e.target.value })
-        }
-      />
-      <div className="flex justify-end mt-4">
-        <button
-          className="bg-gray-400 text-white px-4 py-2 rounded-lg mr-2"
-          onClick={() => setIsModalOpen(false)}
-        >
-          Cancel
-        </button>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-          onClick={() => {
-            updateWarehouse();
-            setIsModalOpen(false);
-          }}
-        >
-          Save
-            </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 className="text-xl font-bold mb-4">Edit Warehouse</h2>
+            <input
+              type="text"
+              placeholder="Warehouse Name"
+              className="border p-3 w-full rounded-lg mb-2"
+              value={editingWarehouse.name}
+              onChange={(e) =>
+                setEditingWarehouse({ ...editingWarehouse, name: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Address"
+              className="border p-3 w-full rounded-lg mb-2"
+              value={editingWarehouse.address}
+              onChange={(e) =>
+                setEditingWarehouse({ ...editingWarehouse, address: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Longitude"
+              className="border p-3 w-full rounded-lg mb-2"
+              value={editingWarehouse.longitude}
+              onChange={(e) =>
+                setEditingWarehouse({ ...editingWarehouse, longitude: e.target.value })
+              }
+            />
+            <input
+              type="text"
+              placeholder="Latitude"
+              className="border p-3 w-full rounded-lg mb-2"
+              value={editingWarehouse.latitude}
+              onChange={(e) =>
+                setEditingWarehouse({ ...editingWarehouse, latitude: e.target.value })
+              }
+            />
+            <div className="flex justify-end mt-4">
+              <button
+                className="bg-gray-400 text-white px-4 py-2 rounded-lg mr-2"
+                onClick={() => setIsModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+                onClick={() => {
+                  updateWarehouse();
+                  setIsModalOpen(false);
+                }}
+              >
+                Save
+              </button>
             </div>
           </div>       
         </div>  
       )}
       </main>
-        </div>
-        <Footer /> 
-      </div>
-      
     );
   };
   

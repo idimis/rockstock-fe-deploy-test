@@ -6,7 +6,6 @@ import Image from "next/image";
 import SimpleNavbar from "@/components/common/SimpleNavbar";
 import Footer from "@/components/common/Footer";
 import { AiOutlineCloudUpload, AiOutlineCheckCircle } from "react-icons/ai";
-import { FaCheckCircle } from "react-icons/fa";
 import { updateOrderStatus } from "@/services/orderService";
 
 const ManualPayment = () => {
@@ -159,8 +158,7 @@ const ManualPayment = () => {
 
         {showPopup && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
-              <FaCheckCircle color="green" size={54} className="mx-auto mb-2" />
+            <div className="flex flex-col bg-white p-6 rounded-lg shadow-lg max-w-sm w-full text-center">
               <p className="text-lg font-semibold text-gray-900">{showPopup}</p>
               <button
                 onClick={handleClosePopup}

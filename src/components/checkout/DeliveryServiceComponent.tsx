@@ -15,37 +15,32 @@ const DeliveryServiceComponent: React.FC<DeliveryServiceProps> = ({ origin, dest
   const accessToken = getAccessToken();
 
   const fetchDeliveryServices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     if (!origin || !destination || !weight || !accessToken) {
-      console.warn("🚨 Missing required props or access token!", { origin, destination, weight, accessToken });
+      console.warn("Missing required props or access token!", { origin, destination, weight, accessToken });
       return;
     }
-
-    console.log("📡 Fetching delivery services...");
-
     try {
-      setLoading(true);
-      setError(null);
-
       const response = await axios.post(
         API_BASE_URL,
         { origin, destination, weight, courier: "jne" },
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
 
-      console.log("✅ API Response:", response.data);
-
       if (response.data?.data) {
         setServices(response.data.data);
       } else {
         setServices([]);
-        console.warn("⚠️ Unexpected response format:", response.data);
+        console.warn("Unexpected response format:", response.data);
       }
     } catch (error) {
       setError("Failed to fetch delivery services.");
       if (axios.isAxiosError(error)) {
-        console.error("❌ Axios Error:", error.response?.data || error.message);
+        console.error("Axios Error:", error.response?.data || error.message);
       } else {
-        console.error("❌ Unexpected Error:", error);
+        console.error("Unexpected Error:", error);
       }
     } finally {
       setLoading(false);
@@ -64,12 +59,16 @@ const DeliveryServiceComponent: React.FC<DeliveryServiceProps> = ({ origin, dest
   return (
     <div className="p-6 bg-white shadow-md rounded-lg mb-4">
       <h2 className="text-lg font-bold text-gray-900 mb-4">Select Delivery Service</h2>
-
       {loading ? (
-        <p>Loading delivery details...</p>
+        <div className="flex justify-center items-center py-6">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+            <p className="mt-2 text-gray-800 font-semibold">Getting delivery details...</p>
+          </div>
+        </div>
       ) : error ? (
         <p className="text-red-500">{error}</p>
-      ) : services.length === 0 ? (
+      ) : !loading && services.length === 0 ? (
         <p className="text-gray-500">No delivery options available.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -26,7 +26,7 @@ export const getAddresses = async (attempt = 1): Promise<Address[]> => {
       return getAddresses(attempt + 1);
     }
 
-    throw new Error(errorMessage);
+    return [];
   }
 };
 

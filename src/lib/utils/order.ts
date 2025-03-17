@@ -33,6 +33,14 @@ export const handleOpenPaymentProof = (order: Order) => {
   }
 };
 
+export const handleGatewayPayment = (order: Order) => {
+  if (order.paymentRedirectUrl) {
+    window.open(order.paymentRedirectUrl, "_blank");
+  } else {
+    console.warn("No payment proof available for this order.");
+  }
+};
+
 export const handleRejectPaymentProof = async (
   order: Order, 
   filters: OrderFilterProps["filters"], 
@@ -81,6 +89,23 @@ export const handleDeliverOrder = async (
     fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
   } catch (error) {
     console.error("Failed to deliver order", error);
+  }
+};
+
+export const handleCompleteOrder = async (
+  order: Order, 
+  filters: OrderFilterProps["filters"], 
+  page: number, 
+  size: number, 
+  setOrders: (orders: Order[]) => void, 
+  setTotalPages: (totalPages: number) => void
+) => {
+  try {
+    await updateOrderStatus("COMPLETED", {}, order.orderId);
+    console.log("Order completed");
+    fetchAndSetOrders(filters, page, size, setOrders, setTotalPages);
+  } catch (error) {
+    console.error("Failed to complete the order", error);
   }
 };
 
