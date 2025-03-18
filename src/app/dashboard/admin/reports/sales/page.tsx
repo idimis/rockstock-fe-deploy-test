@@ -1,247 +1,213 @@
-"use client";
+"use client"
 
-import { useCallback, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { getAccessToken } from "@/lib/utils/auth";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Bar, XAxis, YAxis, Tooltip, Legend, Line, ResponsiveContainer, ComposedChart, CartesianGrid } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { decodeToken } from "@/lib/utils/decodeToken";
-import { fetchWarehouses, fetchWHAdminWarehouses } from "@/services/warehouseService";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getAccessToken } from "@/lib/utils/auth";
 
-interface Warehouse {
+type Warehouse = {
   id: number;
   name: string;
-}
+};
 
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-}
-
-interface SalesData {
+type Product = {
+  productId: number;
   productName: string;
-  totalSales: number;
-}
+};
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+type Category = {
+  categoryId: number;
+  categoryName: string;
+};
+
+type ReportEntry = {
+  month: string;
+  totalSales: number;
+  totalQuantity: number;
+};
+
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 const SalesReport = () => {
-  const [data, setData] = useState<SalesData[]>([]);
+  const [year, setYear] = useState(new Date().getFullYear());
+  const [warehouseId, setWarehouseId] = useState<string | null>(null);
+  const [productId, setProductId] = useState<string | null>(null);
+  const [productCategoryId, setProductCategoryId] = useState<string | null>(null);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [filters, setFilters] = useState({
-    month: (new Date().getMonth() + 1).toString(),
-    year: new Date().getFullYear().toString(),
-    warehouseId: "all",
-    productCategoryId: "all",
-    productId: "all",
-  });
-  const accessToken = getAccessToken();
-  const decoded = accessToken ? decodeToken(accessToken) : null;
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [reportData, setReportData] = useState<ReportEntry[]>([]);
 
-  useEffect(() => {
-    if (decoded?.roles?.[0] === "Super Admin") {
-      fetchWarehouses()
-      .then(({ warehouses }) => setWarehouses(warehouses))
-      .catch(() => console.error("Failed to fetch warehouses"));
-    }
-    if (decoded?.roles?.[0] === "Warehouse Admin") {
-      fetchWHAdminWarehouses()
-      .then(({ warehouses }) => setWarehouses(warehouses))
-      .catch(() => console.error("Failed to fetch warehouses"));
-    }
-  }, [decoded?.roles?.[0]]);
-
-  // const fetchWarehouses = async () => {
-  //   try {
-  //     const response = await axios.get(`${API_BASE_URL}/warehouses`);
-  //     if (Array.isArray(response.data)) {
-  //       setWarehouses(response.data);
-  //     } else {
-  //       console.error("Unexpected response format for product categories:", response.data);
-  //       setWarehouses([]);
-  //     }
-  //     setWarehouses(response.data);
-  //   } catch (error) {
-  //     console.error("Failed to fetch warehouses");
-  //   }
-  // };
-
-  const fetchCategories = async () => {
+  const fetchReport = async () => {
+    const accessToken = getAccessToken();
+  
     try {
-      const response = await axios.get(`${API_BASE_URL}/categories/all`);
-      if (Array.isArray(response.data?.data)) {
-        setCategories(response.data?.data);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/reports/monthly`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        params: { year, warehouseId, productId, productCategoryId },
+      });
+  
+      const aggregatedData = response.data.reduce((acc: Record<string, ReportEntry>, entry: ReportEntry) => {
+        if (!acc[entry.month]) {
+          acc[entry.month] = { ...entry };
+        } else {
+          acc[entry.month].totalSales += entry.totalSales;
+          acc[entry.month].totalQuantity += entry.totalQuantity;
+        }
+        return acc;
+      }, {});
+  
+      setReportData(Object.values(aggregatedData));
+    } catch (error) {
+      console.error("Error fetching report:", error);
+      setReportData([]);
+    }
+  };
+
+  const fetchWarehouses = async () => {
+    try {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/warehouses`);
+      if (Array.isArray(response.data)) {
+        setWarehouses(response.data);
       } else {
-        console.error("Unexpected response format for product categories:", response.data?.data);
-        setCategories([]);
+        setWarehouses([]);
       }
     } catch (error) {
-      console.error("Failed to fetch categories", error);
-      setCategories([]);
+      console.error("Error fetching warehouses:", error);
     }
   };
 
   const fetchProducts = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/products/all`); 
-      if (Array.isArray(response.data?.data)) {
-        setProducts(response.data?.data);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/all`);
+      console.log("Response Product: ", response.data);
+      
+      if (Array.isArray(response.data)) {
+        setProducts(response.data);
       } else {
-        console.error("Unexpected response format for products:", response.data?.data);
         setProducts([]);
       }
     } catch (error) {
-      console.error("Failed to fetch products", error);
-      setProducts([]);
+      console.error("Error fetching products:", error);
     }
   };
 
-  const aggregateSalesData = (data: SalesData[]) => {
-    const aggregated: Record<string, number> = {};
-
-    data.forEach(({ productName, totalSales }) => {
-      aggregated[productName] = (aggregated[productName] || 0) + totalSales;
-    });
-
-    return Object.entries(aggregated).map(([productName, totalSales]) => ({
-      productName,
-      totalSales,
-    }));
-  };
-
-  const fetchSalesReport = useCallback(async () => {
+  const fetchCategories = async () => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/reports/sales`, {
-        params: filters,
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-
-      const aggregatedData = aggregateSalesData(response.data || []);
-      setData(aggregatedData);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/categories/all`);
+      console.log("Response Category: ", response.data);
+  
+      if (Array.isArray(response.data)) {
+        setCategories(response.data);
+      } else {
+        console.error("Data received is not an array:", response.data);
+        setCategories([]);
+      }
     } catch (error) {
-      console.error("Failed to fetch sales report", error);
+      console.error("Error fetching categories:", error);
+      setCategories([]);
     }
-  }, [filters, accessToken]);
+  };
+  
+
+  useEffect(() => {
+    fetchReport();
+  }, [year, warehouseId, productId, productCategoryId]);
 
   useEffect(() => {
     fetchWarehouses();
-    fetchCategories();
     fetchProducts();
+    fetchCategories(); 
   }, []);
 
-  useEffect(() => {
-    fetchSalesReport();
-  }, [fetchSalesReport]);
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
   return (
-    <div className="p-6">
-      <Card>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Select onValueChange={(value) => handleFilterChange("year", value)} defaultValue={filters.year}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Year" />
-              </SelectTrigger>
-              <SelectContent>
-                {[2023, 2024, 2025].map((year) => (
-                  <SelectItem key={year} value={year.toString()}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+    <Card className="p-4">
+      <h2 className="text-xl font-semibold">Sales Report</h2>
+      <div className="grid grid-cols-4 gap-4 mt-4">
+        <Select value={year.toString()} onValueChange={(val) => setYear(parseInt(val))}>
+          <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+          <SelectContent>
+            {[...Array(5)].map((_, i) => {
+              const y = new Date().getFullYear() - i;
+              return <SelectItem key={y} value={y.toString()}>{y}</SelectItem>;
+            })}
+          </SelectContent>
+        </Select>
+        
+        <Select value={warehouseId ?? "all"} onValueChange={(val) => setWarehouseId(val === "all" ? null : val)}>
+          <SelectTrigger><SelectValue placeholder="Select Warehouse" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Warehouses</SelectItem>
+            {warehouses.map((wh) => (
+              <SelectItem key={wh.id} value={wh.id.toString()}>{wh.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-            <Select onValueChange={(value) => handleFilterChange("month", value)} defaultValue={filters.month}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Month" />
-              </SelectTrigger>
-              <SelectContent>
-                {Array.from({ length: 12 }, (_, i) => (i + 1).toString()).map((month) => (
-                  <SelectItem key={month} value={month}>
-                    {month}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        <Select value={productId ?? "all"} onValueChange={(val) => setProductId(val === "all" ? null : val)}>
+          <SelectTrigger><SelectValue placeholder="Select Product" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Products</SelectItem>
+            {products.map((prod) => (
+              <SelectItem key={prod.productId} value={prod.productId.toString()}>{prod.productName}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-            <Select value={filters.warehouseId} onValueChange={(value) => handleFilterChange("warehouseId", value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Warehouse" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Warehouses</SelectItem>
-                {warehouses.map((wh) => (
-                  <SelectItem key={wh.id} value={wh.id.toString()}>
-                    {wh.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        <Select value={productCategoryId ?? "all"} onValueChange={(val) => setProductCategoryId(val === "all" ? null : val)}>
+          <SelectTrigger><SelectValue placeholder="Select Category" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat.categoryId} value={cat.categoryId.toString()}>{cat.categoryName}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Select value={filters.productCategoryId} onValueChange={(value) => handleFilterChange("productCategoryId", value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Product Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Product Categories</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>
-                    {cat.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={filters.productId} onValueChange={(value) => handleFilterChange("productId", value)}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select Product" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Products</SelectItem>
-                {products?.map((prod) => (
-                  <SelectItem key={prod.id} value={prod.id.toString()}>
-                    {prod.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Button className="mt-4" onClick={fetchSalesReport}>
-            Apply Filters
-          </Button>
-        </CardContent>
-      </Card>
-
-      <div className="mt-6">
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data}>
-            <XAxis dataKey="productName" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="totalSales" fill="#8884d8" />
-          </BarChart>
-        </ResponsiveContainer>
       </div>
-    </div>
+      <CardContent>
+        {reportData.length ? (
+          <ResponsiveContainer width="100%" height={400}>
+            <ComposedChart data={reportData.map(d => ({ ...d, month: monthNames[parseInt(d.month) - 1] }))}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="month" />
+              <YAxis 
+                yAxisId="left" 
+                tickFormatter={(value) => value.toLocaleString()} 
+                allowDecimals={false} 
+                width={100}
+              />
+              <YAxis 
+                yAxisId="right" 
+                orientation="right" 
+                tickFormatter={(value) => value.toLocaleString()} 
+                allowDecimals={false} 
+              />
+              <Tooltip formatter={(value) => value.toLocaleString()} />
+              <Legend />
+              <Bar 
+                yAxisId="left" 
+                dataKey="totalSales" 
+                fill="#ff0000" 
+                name="Total Sales" 
+              />
+              <Line 
+                yAxisId="right" 
+                type="monotone" 
+                dataKey="totalQuantity" 
+                stroke="#0000ff" 
+                strokeWidth={3} 
+                name="Total Quantity" 
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
+        ) : (
+          <p>No data available</p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
