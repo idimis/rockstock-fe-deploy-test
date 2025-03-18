@@ -69,7 +69,7 @@ const AdminSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         <SidebarMenu 
           title="📈 Reports & Analytics" 
           links={[
-            { name: "Sales Report", path: "/dashboard/admin/reports" }
+            { name: "Sales Report", path: "/dashboard/admin/reports/sales" }
           ]}
         />
         <SidebarMenu 
