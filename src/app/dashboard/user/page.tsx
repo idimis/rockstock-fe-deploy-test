@@ -4,13 +4,6 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-type CustomUser = {
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-  isVerified?: boolean; // Tambahkan properti ini
-};
-
 const UserDashboard = () => {
   const sessionData = useSession();
   const session = sessionData?.data;
@@ -21,7 +14,6 @@ const UserDashboard = () => {
   const [showSignupNotif, setShowSignupNotif] = useState(false);
   const [showActivationNotif, setShowActivationNotif] = useState(false);
   const [showPasswordSetupNotif, setShowPasswordSetupNotif] = useState(false);
-  const [showResendVerification, setShowResendVerification] = useState(false);
 
   useEffect(() => {
     console.log("Session status:", status);
@@ -30,20 +22,18 @@ const UserDashboard = () => {
     if (status === "loading") return;
 
     if (session?.user) {
-      const user = session.user as CustomUser; // Type assertion
-      console.log("User logged in via social login:", user);
-      sessionStorage.setItem("fullname", user.name ?? user.email ?? "User");
-      sessionStorage.setItem("is_verified", user.isVerified ? "true" : "false");
-      setFullname(user.name ?? user.email ?? "User");
+      console.log("User logged in via social login:", session.user);
+      sessionStorage.setItem("fullname", session.user.name ?? session.user.email ?? "User");
+      sessionStorage.setItem("is_verified", "true");
+      setFullname(session.user.name ?? session.user.email ?? "User");
     } else {
       const storedFullname = localStorage.getItem("fullname");
       const verifiedStatus = localStorage.getItem("is_verified") === "true";
       const isNewSignup = localStorage.getItem("newSignup") === "true";
       const isActivated = localStorage.getItem("accountActivated") === "true";
       const isPasswordSet = localStorage.getItem("passwordSet") === "true";
-      const signupTime = localStorage.getItem("signupTime");
 
-      console.log("Checking localStorage:", { storedFullname, verifiedStatus, isNewSignup, isActivated, isPasswordSet, signupTime });
+      console.log("Checking localStorage:", { storedFullname, verifiedStatus, isNewSignup, isActivated, isPasswordSet });
 
       if (storedFullname) {
         setFullname(storedFullname);
@@ -65,14 +55,6 @@ const UserDashboard = () => {
           localStorage.removeItem("passwordSet");
           setTimeout(() => setShowPasswordSetupNotif(false), 5000);
         }
-
-        if (!verifiedStatus && signupTime) {
-          const elapsedTime = (Date.now() - parseInt(signupTime, 10)) / (1000 * 60); 
-          if (elapsedTime > 10) { 
-            setShowResendVerification(true);
-          }
-        }
-        
       } else {
         console.log("Redirecting to /login...");
         setTimeout(() => router.push("/login"), 500);
@@ -101,18 +83,6 @@ const UserDashboard = () => {
       {showPasswordSetupNotif && (
         <div className="mb-4 p-4 bg-purple-100 border border-purple-400 text-purple-700 rounded-lg">
           <p>🔐 Your password has been successfully set! You can now log in securely.</p>
-        </div>
-      )}
-
-      {showResendVerification && (
-        <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-          <p>⚠️ Your email is not verified yet. Click below to resend the verification email.</p>
-          <button
-            onClick={() => router.push("/auth/resend-verification")}
-            className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition duration-300"
-          >
-            Resend Verification Email
-          </button>
         </div>
       )}
 
