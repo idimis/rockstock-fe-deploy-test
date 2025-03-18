@@ -34,9 +34,9 @@ const Navbar: React.FC<NavbarProps> = () => {
     setAccessToken(token);
 
     if (token) {
-      const decodedToken = decodeToken(token);
-      if (decodedToken && ["Customer", "Super Admin", "Warehouse Admin"].includes(decodedToken.roles)) {
-        setDecoded({ roles: decodedToken.roles as UserRole });
+      const decodedToken = token ? decodeToken(token) : null;
+      if (decodedToken && ["Customer", "Super Admin", "Warehouse Admin"].includes(decodedToken?.roles?.[0])) {
+        setDecoded({ roles: decodedToken?.roles?.[0] as UserRole });
       }
     }
 
