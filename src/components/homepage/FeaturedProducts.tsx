@@ -27,7 +27,7 @@ const featuredProducts = [
     slug: "emo-sofa",
   },
   {
-    name: "Alternative Coffee Table",
+    name: "Slow-rock Coffee Table",
     description: "A unique coffee table to add a touch of personality to your space.",
     price: "$149.99",
     imageUrl: "/images/alternative-coffee-table.jpg",
