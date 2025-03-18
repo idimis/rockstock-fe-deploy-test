@@ -23,8 +23,8 @@ const ImageCarousel: React.FC<ImageCarouselProps> = ({ images }) => {
       <Image
         src={currentImage?.productPictureUrl || "/placeholder.png"}
         alt="Product"
-        width={256} // Sesuaikan dengan ukuran yang diperlukan (64 * 4)
-        height={256} // Sesuaikan dengan ukuran yang diperlukan
+        width={256}
+        height={256}
         className="w-full h-full object-cover rounded-md"
         priority
       />

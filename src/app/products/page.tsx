@@ -18,8 +18,8 @@ const Inspirations: React.FC = () => {
           the scholarly vibe of dark academia, or a nostalgic emo touch, we have something special for you.
         </p>
         <Suspense fallback={<div>Loading Product Cust...</div>}>
-        <ProductCust />
-      </Suspense>
+          <ProductCust />
+        </Suspense>
       </main>
       <Footer />
     </div>

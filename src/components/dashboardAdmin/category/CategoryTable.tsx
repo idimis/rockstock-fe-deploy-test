@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useCategories } from "@/hooks/useCategories";
 import SkeletonRow from "@/components/dashboardAdmin/category/SkeletonRow";
 import Pagination from "@/components/dashboardAdmin/Pagination";
-import SearchBar from "@/components/dashboardAdmin/SearchBar";
+import SearchBar from "@/components/dashboardAdmin/category/SearchBar";
 import { useState, useEffect, Suspense } from "react";
 import CategoryModal from "@/components/dashboardAdmin/category/CategoryModal";
 import CategoryItem from "@/components/dashboardAdmin/category/CategoryItem";
@@ -14,7 +14,7 @@ const CategoryTable = () => {
   const searchParams = useSearchParams();
   const currentPage = Number(searchParams.get("page")) || 1;
   const searchQueryFromURL = searchParams.get("search") || "";
-  const pageSize = 10;
+  const pageSize = 8;
 
   const [isFetching, setIsFetching] = useState(true);
   const { data, isLoading } = useCategories(currentPage, pageSize, searchQueryFromURL);
@@ -34,13 +34,8 @@ const CategoryTable = () => {
     return () => clearTimeout(timeout);
   }, [isLoading]);
 
-  const updatePage = (page: number) => {
-    setIsFetching(true);
-    window.location.href = `/dashboard/admin/categories?page=${page}&search=${searchQueryFromURL}`;
-  };
-
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg">
+    <div className="p-6 bg-white shadow-md rounded-lg w-full h-full">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
         <h2 className="text-xl md:text-4xl text-center font-semibold text-gray-800 mb-6 md:mb-0">
           📦 Category Management
@@ -58,15 +53,15 @@ const CategoryTable = () => {
         </div>
       </div>
 
-      <div className="w-full md:w-auto flex md:justify-end">
-      <Suspense fallback={<div>Loading Product Cust...</div>}>
-        <SearchBar basePath="/dashboard/admin/categories"/>
+      <div className="w-full md:w-full flex md:justify-end">
+        <Suspense fallback={<div>Loading Category Management...</div>}>
+          <SearchBar basePath="/dashboard/admin/categories"/>
         </Suspense>
       </div>
 
-      <div className="space-y-4 mt-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         {isFetching ? (
-          Array.from({ length: 10 }).map((_, index) => <SkeletonRow key={index} />)
+          Array.from({ length: 8 }).map((_, index) => <SkeletonRow key={index} />)
         ) : (data?.content ?? []).length > 0 ? (
           (data?.content ?? []).map((category: Category) => (
             <CategoryItem 
@@ -90,7 +85,6 @@ const CategoryTable = () => {
       <Pagination
         currentPage={currentPage}
         totalPages={data?.totalPages ?? 1}
-        onPageChange={updatePage} 
         basePath={"/dashboard/admin/categories"}
       />
 

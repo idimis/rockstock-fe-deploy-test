@@ -6,7 +6,7 @@ import ProductTable from "@/components/dashboardAdmin/product/ProductTable";
 import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-const AdminCategory = () => {
+const AdminProduct = () => {
   const router = useRouter();
 
   useEffect(() => {
@@ -19,15 +19,15 @@ const AdminCategory = () => {
   
   return (
     <div className="flex min-h-screen flex-col">
-    <ToastContainer />
-      <main className="flex-grow p-6 shadow-md">       
-        {/* CategoryTable */}
-        <Suspense fallback={<div>Loading Product Cust...</div>}>
-        <ProductTable />
-        </Suspense>
-      </main>
+      <ToastContainer />
+        <main className="flex-grow p-6 overflow-hidden">       
+          {/* ProductTable */}
+          <Suspense fallback={<div>Loading Products Management...</div>}>
+            <ProductTable />
+          </Suspense>
+        </main>
     </div>
   );
 };
 
-export default AdminCategory;
+export default AdminProduct;

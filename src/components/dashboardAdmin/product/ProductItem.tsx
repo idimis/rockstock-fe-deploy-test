@@ -55,8 +55,8 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
   };
 
   return (
-    <div className="bg-gray-100 p-4 rounded-lg shadow-sm flex flex-col md:flex-row items-center space-y-4 md:space-x-6">
-      <div className="relative w-40 h-40 flex-shrink-0">
+    <div className="flex flex-col md:flex-row items-center md:justify-between bg-gray-100 p-4 lg:pt-4 lg:pl-4 rounded-lg shadow-sm w-full min-w-0">
+      <div className="relative w-40 h-40 flex-shrink-0 lg:mr-6">
         {product.productPictures && product.productPictures.length > 0 ? (
           <>
             <Image
@@ -91,16 +91,18 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
       </div>
 
       <div className="flex-grow text-center md:text-left">
-        <h3 className="text-xl font-bold text-gray-900">{product.productName}</h3>
+        <h3 className="mt-2 lg:mt-0 text-xl font-bold text-gray-900">{product.productName}</h3>
         <p className="text-sm text-blue-600">{product.categoryName}</p>
-        <p className="text-sm text-gray-700">Weight: {product.weight}g</p>
+        <p className="text-sm text-gray-700">
+          Weight: {product.weight >= 1000 ? `${product.weight / 1000} kg` : `${product.weight} g`}
+        </p>        
         <p className="text-sm font-semibold text-gray-900">
           Price: Rp {product.price.toLocaleString()}
         </p>
         <p className="text-md text-gray-700 mt-2">{product.detail}</p>
       </div>
 
-      <div className="flex items-center text-center gap-2">
+      <div className="flex items-center text-center gap-2 mb-2 lg:mr-10">
         <p className="text-lg font-semibold text-gray-800">Total Stock:</p>
         <p className="text-lg font-bold text-gray-900">{product.totalStock}</p>
       </div>
@@ -123,21 +125,24 @@ const ProductItem: React.FC<ProductItemProps> = ({ product }) => {
       </div>
 
       {isConfirmOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50  z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-full sm:max-w-lg w-1/2 sm:w-96 text-center">
-            <h2 className="text-lg font-semibold text-gray-800">
-              Do you really want to delete this product?
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center">
+          <h2 className="text-xl font-semibold text-gray-900">
+            Do you really want
             </h2>
-            <div className="flex justify-center gap-4 mt-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              to delete this product?
+            </h2>
+            <div className="flex justify-center gap-6 mt-5">
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                className="px-5 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 text-lg"
                 onClick={() => deleteMutation.mutate()}
                 disabled={deleteMutation.isPending}
               >
                 {deleteMutation.isPending ? "Deleting..." : "Confirm"}
               </button>
               <button
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                className="px-5 py-3 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 text-lg"
                 onClick={() => setIsConfirmOpen(false)}
               >
                 Cancel

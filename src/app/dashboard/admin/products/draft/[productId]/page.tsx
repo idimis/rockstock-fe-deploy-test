@@ -73,9 +73,12 @@ const ProductDraftForm = () => {
         setSubmitting(false);
         return;
       }
-    
+
+      console.log("Formik Errors:", formik.errors);
+      console.log("Formik Values:", formik.values);
+      const finalValues = { ...values, categoryId: values.productCategory };  
       try {
-        await axiosInstance.patch(`/products/${productId}/create`, values);
+        await axiosInstance.patch(`/products/${productId}/create`, finalValues);
         router.push("/dashboard/admin/products");
         localStorage.setItem("toastMessage", "Product created successfully!");
       } catch (error: unknown) {

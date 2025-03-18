@@ -2,9 +2,9 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { useProducts } from "@/hooks/useProducts";
-import FullSkeleton from "@/components/dashboardAdmin/product/common/FullSkeleton";
+import FullSkeleton from "@/components/products/FullSkeleton";
 import { Product } from "@/types/product";
-import ProductsPage from "@/components/products/ProductsPage";
+import Pagination from "@/components/products/Pagination";
 import ProductsFilter from "@/components/products/ProductFilter";
 import ProductsItem from "@/components/products/ProductsItem";
 
@@ -45,10 +45,6 @@ const ProductsCust = () => {
     router.push(`/products?${query.toString()}`);
   };  
 
-  const handlePageChange = (page: number) => {
-    updateQueryParams({ page });
-  };
-
   const handleFilterChange = (filters: { category?: number | null; sortField?: string; sortDirection?: string }) => {
     updateQueryParams({
       category: filters.category ?? null,
@@ -74,9 +70,9 @@ const ProductsCust = () => {
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
       {isLoading ? (
-          Array.from({ length: 10 }).map((_, index) => <FullSkeleton key={index} />)
+          Array.from({ length: 12 }).map((_, index) => <FullSkeleton key={index} />)
         ) : (
           (data?.content ?? []).length > 0 ? (
             (data?.content ?? []).map((product: Product) => (
@@ -90,10 +86,9 @@ const ProductsCust = () => {
         )}
       </div>
 
-      <ProductsPage
+      <Pagination
         currentPage={currentPage}
         totalPages={data?.totalPages ?? 1}
-        onPageChange={handlePageChange}
         basePath={"/products"}
       />
     </div>

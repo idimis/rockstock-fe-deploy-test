@@ -14,19 +14,21 @@ import * as Yup from 'yup' ;
     price: Yup.number()
       .required("Required")
       .typeError("Price must be a number")
-      .moreThan(100, "Price must be greater than 100")
-      .max(10000000, "Price must not exceed Rp. 10,000,000"),
+      .moreThan(99, "Price must be at least 100")
+      .max(100000000, "Price must not exceed Rp. 100,000,000"),
     weight: Yup.number()
       .required("Required")
       .typeError("Weight must be a number")
-      .moreThan(100, "Weight must be greater than 100")
-      .max(50000, "Weight must not exceed 50,000 grams (50kg)"),
+      .moreThan(99, "Weight must be at least 100")
+      .max(500000, "Weight must not exceed 500,000 grams (500kg)"),
     productCategory: Yup.string()
       .required("Category is required"),
     productPictures: Yup.array()
-      .nullable()
-      .default([null, null, null])
-      .test("at-least-one-image", "At least one image in Position 1 is required", (value) =>
-        Array.isArray(value) && value[0] !== null
+      .of(Yup.string().nullable())
+      .required("At least one image in Position 1 is required")
+      .test(
+        "at-least-one-image", 
+        "At least one image in Position 1 is required",
+        (value) => Array.isArray(value) && !!value[0]
       ),
   });
