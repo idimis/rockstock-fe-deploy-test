@@ -9,31 +9,25 @@ import Link from 'next/link';
 
 const slides = [
   { image: heroImage1, text: "Find your rockstar aesthetic furniture." },
-  { image: heroImage2, text: "Curated pieces for those who don't fit with instagram aesthetic standard." },
-  { image: heroImage3, text: "Craft Your Space with Rock n' Roll, Raw, Untamed Vibes." },
+  { image: heroImage2, text: "Curated pieces for those who don't fit with Instagram aesthetic standard." },
+  { image: heroImage3, text: "Craft your space with rock n' roll and untamed vibes." },
 ];
 
 const HeroSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % slides.length);
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
-  };
+  const nextSlide = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentIndex((prev) => (prev - 1 + slides.length) % slides.length);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      nextSlide();
-    }, 5000);
+    const interval = setInterval(nextSlide, 5000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative w-full h-[600px] md:h-[700px] flex items-center justify-center overflow-hidden">
-      <div className="w-full h-full relative">
+    <div className="relative w-full h-[700px] md:h-[800px] flex flex-col md:flex-row items-center justify-center overflow-hidden text-black px-10 md:px-20 py-16">
+      {/* Image Section */}
+      <div className="relative w-full md:w-3/5 h-[500px] md:h-full">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentIndex}
@@ -46,18 +40,19 @@ const HeroSection = () => {
             <Image
               src={slides[currentIndex].image}
               alt="Hero Image"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover rounded-2xl shadow-lg"
               priority
             />
           </motion.div>
         </AnimatePresence>
       </div>
-
-      <div className="absolute bottom-12 w-full flex flex-col items-center text-center px-6">
+      
+      {/* Text Section */}
+      <div className="w-full md:w-2/5 flex flex-col items-start justify-center space-y-8 text-left mt-12 md:mt-0 md:ml-12">
         <AnimatePresence mode="wait">
           <motion.h1
             key={currentIndex}
-            className="text-4xl md:text-4xl font-bold text-black drop-shadow-lg bg-white/90 px-6 py-3 rounded-lg"
+            className="text-3xl md:text-5xl font-bold"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -66,23 +61,21 @@ const HeroSection = () => {
             {slides[currentIndex].text}
           </motion.h1>
         </AnimatePresence>
-
-        <p className="mt-4 text-lg md:text-xl text-black bg-white/80 px-4 py-2 rounded-lg">
-          Dedicated for those who lived and breathed the music of the 90s-00s.<br />
-          Rock your home with style and nostalgia because punk, rock, and emo never dies!
+        
+        <p className="text-lg md:text-xl text-black leading-relaxed">
+          Dedicated for those who lived and breathed the music of the 90s-00s. Rock your home with style and nostalgia because punk, rock, and emo never die!
         </p>
 
-
-        <div className="flex space-x-4 mt-6">
+        <div className="flex space-x-6 mt-6">
           <Link
             href="/products"
-            className="px-6 py-3 bg-black text-white font-semibold rounded-md hover:bg-gray-800 transition"
+            className="px-6 py-3 border border-black text-black font-semibold rounded-md hover:bg-gray-200 transition"
           >
             Shop Our Collection
           </Link>
           <Link
             href="/sections/about"
-            className="px-6 py-3 bg-black text-white font-semibold rounded-md hover:bg-gray-800 transition"
+            className="px-6 py-3 border border-black text-black font-semibold rounded-md hover:bg-gray-200 transition"
           >
             Learn More About Us
           </Link>
@@ -91,24 +84,24 @@ const HeroSection = () => {
 
       {/* Navigation Buttons */}
       <button
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/70 p-3 rounded-full text-black hover:bg-white transition"
+        className="absolute left-6 top-1/2 transform -translate-y-1/2 bg-white/20 p-3 rounded-full text-white hover:bg-white/40 transition"
         onClick={prevSlide}
       >
         <ChevronLeft size={30} />
       </button>
       <button
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/70 p-3 rounded-full text-black hover:bg-white transition"
+        className="absolute right-6 top-1/2 transform -translate-y-1/2 bg-white/20 p-3 rounded-full text-white hover:bg-white/40 transition"
         onClick={nextSlide}
       >
         <ChevronRight size={30} />
       </button>
 
       {/* Indicators */}
-      <div className="absolute bottom-6 flex space-x-2">
+      <div className="absolute bottom-8 flex space-x-3">
         {slides.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-black' : 'bg-gray-400'} transition`}
+            className={`w-3 h-3 rounded-full ${index === currentIndex ? 'bg-white' : 'bg-gray-500'} transition`}
             onClick={() => setCurrentIndex(index)}
           />
         ))}
