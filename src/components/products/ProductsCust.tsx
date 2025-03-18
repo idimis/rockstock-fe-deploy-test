@@ -45,10 +45,6 @@ const ProductsCust = () => {
     router.push(`/products?${query.toString()}`);
   };  
 
-  const handlePageChange = (page: number) => {
-    updateQueryParams({ page });
-  };
-
   const handleFilterChange = (filters: { category?: number | null; sortField?: string; sortDirection?: string }) => {
     updateQueryParams({
       category: filters.category ?? null,

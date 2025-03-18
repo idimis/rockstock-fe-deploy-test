@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
 import { MutationJournal, MutationStatus } from "@/types/mutationJournal";
-import { formatText, formatUpdatedAt } from "@/utils/FormatNumber";
+import { formatUpdatedAt } from "@/utils/FormatNumber";
 import ApprovalModal from "@/components/dashboardAdmin/journal/ApprovalModal";
 import FinalizeModal from "@/components/dashboardAdmin/journal/FinalizeModal";
 import CancelModal from "@/components/dashboardAdmin/journal/CancelModal";
@@ -90,7 +90,6 @@ const MutationJournalItem: React.FC<MutationJournalItemProps> = ({ journal, ware
   return (
     <div className="bg-gray-50 shadow-md rounded-lg p-4 lg:p-6 w-full min-h-[100px] flex flex-col justify-between">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Left Section */}
         <div className="flex flex-col space-y-1">
           <p className="text-xs text-gray-500">Journal ID: {journal.journalId}</p>
           <p className="text-xs text-gray-500">Warehouse Stock ID: {journal.warehouseStockId}</p>
@@ -98,7 +97,6 @@ const MutationJournalItem: React.FC<MutationJournalItemProps> = ({ journal, ware
           <p className="text-sm text-gray-700">Description: {journal.description}</p>
         </div>
 
-        {/* Middle Section (Centered) */}
         <div className="flex flex-col text-center">
           {journal.originWarehouse !== "N/A" && (
             <p className="text-sm lg:text-lg font-semibold text-gray-700">
@@ -119,7 +117,6 @@ const MutationJournalItem: React.FC<MutationJournalItemProps> = ({ journal, ware
           </p>
         </div>
 
-        {/* Right Section */}
         <div className="flex flex-col items-center md:items-end space-y-2">
           <p className={`text-lg lg:text-2xl font-semibold ${statusColors[journal.mutationStatus]}`}>
             {journal.mutationStatus}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 
 interface CancelModalProps {
   isOpen: boolean;
@@ -8,16 +8,9 @@ interface CancelModalProps {
 }
 
 const CancelModal: React.FC<CancelModalProps> = ({ isOpen, onClose, onConfirm, isLoading }) => {
-  const [isClicked, setIsClicked] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleConfirm = () => {
-    if (!isClicked) {
-      setIsClicked(true);
-      onConfirm();
-    }
-  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -29,7 +22,7 @@ const CancelModal: React.FC<CancelModalProps> = ({ isOpen, onClose, onConfirm, i
           <button
             className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 text-xl"
             onClick={onConfirm}
-            disabled={isLoading || isClicked }
+            disabled={isLoading}
           >
             {isLoading ? "Cancelling..." : "Confirm"}
           </button>
