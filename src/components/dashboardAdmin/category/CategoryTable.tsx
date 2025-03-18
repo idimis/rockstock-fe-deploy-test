@@ -34,11 +34,6 @@ const CategoryTable = () => {
     return () => clearTimeout(timeout);
   }, [isLoading]);
 
-  const updatePage = (page: number) => {
-    setIsFetching(true);
-    window.location.href = `/dashboard/admin/categories?page=${page}&search=${searchQueryFromURL}`;
-  };
-
   return (
     <div className="p-6 bg-white shadow-md rounded-lg w-full h-full">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -90,7 +85,6 @@ const CategoryTable = () => {
       <Pagination
         currentPage={currentPage}
         totalPages={data?.totalPages ?? 1}
-        onPageChange={updatePage} 
         basePath={"/dashboard/admin/categories"}
       />
 

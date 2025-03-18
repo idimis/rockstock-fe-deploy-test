@@ -17,12 +17,20 @@ const StockTable = () => {
   const currentPage = Number(searchParams.get("page")) || 1;
   const searchQuery = searchParams.get("search") || "";
   const warehouseId = searchParams.get("warehouse");
-  const pageSize = 5;
+  const pageSize = 4;
 
   const [selectedWarehouse, setSelectedWarehouse] = useState<number | null>(null);
   const [sortDirection, setSortDirection] = useState<string>("asc");
 
-  const { data, isLoading, refetch } = useStocks(currentPage, pageSize, searchQuery, selectedWarehouse, sortDirection);
+  // ⬇️ Do not fetch data until a warehouse is selected
+  const { data, isLoading, refetch } = useStocks(
+    currentPage,
+    pageSize,
+    searchQuery,
+    selectedWarehouse ? selectedWarehouse : undefined, // Fetch only when warehouse is selected
+    sortDirection
+  );
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStock, setEditingStock] = useState<Stock | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -30,6 +38,8 @@ const StockTable = () => {
   useEffect(() => {
     if (warehouseId) {
       setSelectedWarehouse(Number(warehouseId));
+    } else {
+      setSelectedWarehouse(null); // Reset data when choosing "Choose Warehouse"
     }
   }, [warehouseId]);
 
@@ -54,7 +64,6 @@ const StockTable = () => {
   const refreshStocks = () => {
     refetch();
   };
-
 
   return (
     <div className="p-6 bg-white shadow-md rounded-lg">
@@ -87,37 +96,44 @@ const StockTable = () => {
         </div>
       </div>
 
-      <div className="space-y-4 mt-6">
-        {isLoading ? (
-          Array.from({ length: 5 }).map((_, index) => <StockItemSkeleton key={index} />)
-        ) : (data?.content ?? []).length > 0 ? (
-          (data?.content ?? []).map((stock: Stock) => (
-            <StockItem 
-              key={stock.stockId}
-              stock={stock}
-              onEdit={() => {
-                setEditingStock(stock);
-                setIsModalOpen(true);
-              }}
-            />
-          ))
-        ) : (
-          !isLoading && (
-            <div className="text-center text-gray-500 mt-4">
-              {searchQuery ? `No stocks found for "${searchQuery}"` : "No stocks available"}
-            </div>
-          )
-        )}
-      </div>
+      {/* ⬇️ Show message if no warehouse is selected */}
+      {selectedWarehouse === null ? (
+        <div className="text-center text-gray-500 mt-6">
+          Please choose your warehouse
+        </div>
+      ) : (
+        <div className="space-y-4 mt-6">
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, index) => <StockItemSkeleton key={index} />)
+          ) : (data?.content ?? []).length > 0 ? (
+            (data?.content ?? []).map((stock: Stock) => (
+              <StockItem 
+                key={stock.stockId}
+                stock={stock}
+                onEdit={() => {
+                  setEditingStock(stock);
+                  setIsModalOpen(true);
+                }}
+              />
+            ))
+          ) : (
+            !isLoading && (
+              <div className="text-center text-gray-500 mt-4">
+                {searchQuery ? `No stocks found for "${searchQuery}"` : "No stocks available"}
+              </div>
+            )
+          )}
+        </div>
+      )}
 
-      <Pagination
-        currentPage={currentPage}
-        totalPages={data?.totalPages ?? 1}
-        onPageChange={(page) => {
-          router.push(`/dashboard/admin/stocks?page=${page}&search=${searchQuery}&warehouse=${selectedWarehouse}`);
-        }}
-        basePath={"/dashboard/admin/stocks"}
-      />
+      {/* ⬇️ Hide pagination when no warehouse is selected */}
+      {selectedWarehouse !== null && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={data?.totalPages ?? 1}
+          basePath={"/dashboard/admin/stocks"}
+        />
+      )}
 
       <AdjustStockModal 
         isOpen={isModalOpen}

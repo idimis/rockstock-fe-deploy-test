@@ -4,6 +4,8 @@ export interface MutationJournalResponse {
   }
   
   export interface MutationJournal {
+    originWarehouseId: number;
+    destinationWarehouseId: number;
     newStockQuantity: number;
     previousStockQuantity: number;
     warehouseStockId: number;
@@ -17,6 +19,7 @@ export interface MutationJournalResponse {
     mutationStatus: MutationStatus;
     updatedAt: string;
     description: string;
+    warehouseId: number;
   }
   
   export enum StockChangeType {

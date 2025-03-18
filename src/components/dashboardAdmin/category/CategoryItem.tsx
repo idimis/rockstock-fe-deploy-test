@@ -48,7 +48,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
       </div>
 
       {/* Middle Section: Name (Centered in mobile, left-aligned in PC) */}
-      <p className="mt-4 md:mt-0 md:ml-4 text-lg md:text-2xl font-medium text-gray-800 text-center md:text-left flex-1">
+      <p className="mt-4 md:mt-0 md:ml-4 text-xl md:text-2xl font-medium text-gray-800 text-center md:text-left flex-1">
         {category.categoryName}
       </p>
 
@@ -69,7 +69,7 @@ const CategoryItem: React.FC<CategoryItemProps> = ({ category, onEdit }) => {
 
       {/* Delete Confirmation Modal */}
       {isConfirmOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-96 text-center">
             <h2 className="text-xl font-semibold text-gray-900">
               Do you really want

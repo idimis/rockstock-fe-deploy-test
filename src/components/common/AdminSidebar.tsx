@@ -22,7 +22,7 @@ const AdminSidebar = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
   return (
     <aside
-      className={`bg-white shadow-md w-64 p-4 fixed lg:static top-0 left-0 h-full z-50 transition-transform transform ${
+      className={`bg-white shadow-md w-64 p-4 fixed lg:static top-0 left-0 h-full z-50 lg:z-10 transition-transform transform ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       } lg:translate-x-0 lg:block`}
     >
