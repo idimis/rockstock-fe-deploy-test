@@ -9,7 +9,8 @@ const nextConfig: NextConfig = {
       "dallasofficefurniture.com",
       "www.damotech.com",
       "encrypted-tbn0.gstatic.com",
-      "media.istockphoto.com"
+      "media.istockphoto.com",
+      "lh3.googleusercontent.com"
     ],
     
   },
