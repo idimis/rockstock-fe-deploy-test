@@ -79,7 +79,6 @@ const SignupContent: React.FC = () => {
               <option value="">Select Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
-              <option value="other">Wibu</option>
             </select>
 
             <input type="date" placeholder="Birthdate" className="border border-gray-300 text-gray-600 rounded-lg p-2 w-full mb-4" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} required aria-label="Birthdate" />
