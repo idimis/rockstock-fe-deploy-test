@@ -64,13 +64,25 @@ const CheckoutPage = () => {
       window.snap.pay(snapToken, {
         onSuccess: async (result) => {
           console.log("Payment success:", result);
-          try {
-            await updateOrderStatus("PROCESSING", {}, undefined, result.order_id);
-            toast.success("Payment successful! Redirecting...");
-            router.push("/checkout/success");
-          } catch (error) {
-            console.error("Error updating order status:", error);
-            toast.error("Payment successful, but failed to update order status.");
+          const retries = 5;
+          let attempt = 0;
+
+          while (attempt < retries) {
+            try {
+              await updateOrderStatus("PROCESSING", {}, undefined, result.order_id);
+              toast.success("Payment successful! Redirecting...");
+              return;
+            } catch (error) {
+              attempt++;
+              console.error(`Error updating order status (Attempt ${attempt}):`, error);
+
+              if (attempt < retries) {
+                const delay = Math.pow(2, attempt) * 1000;
+                await new Promise((resolve) => setTimeout(resolve, delay));
+              } else {
+                toast.error("Payment successful, but failed to update order status after multiple attempts.");
+              }
+            }
           }
         },
         onPending: (result) => {
